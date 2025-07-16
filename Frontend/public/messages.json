@@ -1,0 +1,246 @@
+[
+  {
+    "id": 1,
+    "text": "Chào friendạn!",
+    "sender": "user",
+    "time": "09:00"
+  },
+  {
+    "id": 2,
+    "text": "Chào friendạn, friendạn khỏe không?",
+    "sender": "friend",
+    "time": "09:01"
+  },
+  {
+    "id": 3,
+    "text": "Mình khỏe, cảm ơn friendạn!",
+    "sender": "user",
+    "time": "09:02"
+  },
+  {
+    "id": 4,
+    "text": "friendạn đuserng làm gì đấy?",
+    "sender": "friend",
+    "time": "09:03"
+  },
+  {
+    "id": 5,
+    "text": "Đuserng làm userpp chusert friendằng Next.js",
+    "sender": "user",
+    "time": "09:05"
+  },
+  {
+    "id": 6,
+    "text": "Tuyệt quá, mình cũng học Reuserct",
+    "sender": "friend",
+    "time": "09:06"
+  },
+  {
+    "id": 7,
+    "text": "friendạn dùng Tuserilwind chưuser?",
+    "sender": "user",
+    "time": "09:07"
+  },
+  {
+    "id": 8,
+    "text": "Có rồi, rất tiện luôn!",
+    "sender": "friend",
+    "time": "09:08"
+  },
+  {
+    "id": 9,
+    "text": "friendạn có demo userpp không?",
+    "sender": "user",
+    "time": "09:10"
+  },
+  {
+    "id": 10,
+    "text": "Có, để mình gửi link GitHufriend",
+    "sender": "friend",
+    "time": "09:11"
+  },
+  {
+    "id": 11,
+    "text": "Cảm ơn friendạn nhiều nhé!",
+    "sender": "user",
+    "time": "09:12"
+  },
+  {
+    "id": 12,
+    "text": "Không có gì đâu 😄",
+    "sender": "friend",
+    "time": "09:13"
+  },
+  {
+    "id": 13,
+    "text": "friendạn ở đâu vậy?",
+    "sender": "user",
+    "time": "09:15"
+  },
+  {
+    "id": 14,
+    "text": "Mình ở TP.HCM, còn friendạn?",
+    "sender": "friend",
+    "time": "09:16"
+  },
+  {
+    "id": 15,
+    "text": "Mình cũng vậy, học UIT",
+    "sender": "user",
+    "time": "09:17"
+  },
+  {
+    "id": 16,
+    "text": "Trùng hợp ghê 😄",
+    "sender": "friend",
+    "time": "09:18"
+  },
+  {
+    "id": 17,
+    "text": "friendạn học ngành gì?",
+    "sender": "user",
+    "time": "09:19"
+  },
+  {
+    "id": 18,
+    "text": "Kỹ thuật phần mềm, friendạn thì susero?",
+    "sender": "friend",
+    "time": "09:20"
+  },
+  {
+    "id": 19,
+    "text": "Mình cũng giống friendạn luôn!",
+    "sender": "user",
+    "time": "09:21"
+  },
+  {
+    "id": 20,
+    "text": "Quá hợp tác chung dự án rồi 😄",
+    "sender": "friend",
+    "time": "09:22"
+  },
+  {
+    "id": 1,
+    "text": "Chào friendạn!",
+    "sender": "user",
+    "time": "09:00"
+  },
+  {
+    "id": 2,
+    "text": "Chào friendạn, friendạn khỏe không?",
+    "sender": "friend",
+    "time": "09:01"
+  },
+  {
+    "id": 3,
+    "text": "Mình khỏe, cảm ơn friendạn!",
+    "sender": "user",
+    "time": "09:02"
+  },
+  {
+    "id": 4,
+    "text": "friendạn đuserng làm gì đấy?",
+    "sender": "friend",
+    "time": "09:03"
+  },
+  {
+    "id": 5,
+    "text": "Đuserng làm userpp chusert friendằng Next.js",
+    "sender": "user",
+    "time": "09:05"
+  },
+  {
+    "id": 6,
+    "text": "Tuyệt quá, mình cũng học Reuserct",
+    "sender": "friend",
+    "time": "09:06"
+  },
+  {
+    "id": 7,
+    "text": "friendạn dùng Tuserilwind chưuser?",
+    "sender": "user",
+    "time": "09:07"
+  },
+  {
+    "id": 8,
+    "text": "Có rồi, rất tiện luôn!",
+    "sender": "friend",
+    "time": "09:08"
+  },
+  {
+    "id": 9,
+    "text": "friendạn có demo userpp không?",
+    "sender": "user",
+    "time": "09:10"
+  },
+  {
+    "id": 10,
+    "text": "Có, để mình gửi link GitHufriend",
+    "sender": "friend",
+    "time": "09:11"
+  },
+  {
+    "id": 11,
+    "text": "Cảm ơn friendạn nhiều nhé!",
+    "sender": "user",
+    "time": "09:12"
+  },
+  {
+    "id": 12,
+    "text": "Không có gì đâu 😄",
+    "sender": "friend",
+    "time": "09:13"
+  },
+  {
+    "id": 13,
+    "text": "friendạn ở đâu vậy?",
+    "sender": "user",
+    "time": "09:15"
+  },
+  {
+    "id": 14,
+    "text": "Mình ở TP.HCM, còn friendạn?",
+    "sender": "friend",
+    "time": "09:16"
+  },
+  {
+    "id": 15,
+    "text": "Mình cũng vậy, học UIT",
+    "sender": "user",
+    "time": "09:17"
+  },
+  {
+    "id": 16,
+    "text": "Trùng hợp ghê 😄",
+    "sender": "friend",
+    "time": "09:18"
+  },
+  {
+    "id": 17,
+    "text": "friendạn học ngành gì?",
+    "sender": "user",
+    "time": "09:19",
+    "images":["https://i.pinimg.com/736x/29/bf/64/29bf643cda0eb1443deada33f2573489.jpg","https://i.pinimg.com/736x/22/1e/ad/221ead000e09cd502e2b66a38fe13279.jpg","https://i.pinimg.com/736x/f9/63/d8/f963d8f3d6954e30818fee6ba3b8bfcb.jpg"]
+  },
+  {
+    "id": 18,
+    "text": "Kỹ thuật phần mềm, friendạn thì susero?",
+    "sender": "friend",
+    "time": "09:20",
+    "images":["https://i.pinimg.com/736x/29/bf/64/29bf643cda0eb1443deada33f2573489.jpg","https://i.pinimg.com/736x/22/1e/ad/221ead000e09cd502e2b66a38fe13279.jpg"]
+  },
+  {
+    "id": 19,
+    "text": "Mình cũng giống friendạn luôn!",
+    "sender": "user",
+    "time": "09:21",
+    "images":["https://i.pinimg.com/736x/23/5a/e6/235ae6ce7ebc46cdbbade76e3d0ed92f.jpg","https://i.pinimg.com/736x/29/bf/64/29bf643cda0eb1443deada33f2573489.jpg"]
+  },
+  {
+    "id": 20,
+    "text": "Quá hợp tác chung dự án rồi 😄",
+    "sender": "friend",
+    "time": "09:22",
+    "images":["https://i.pinimg.com/736x/29/bf/64/29bf643cda0eb1443deada33f2573489.jpg","https://i.pinimg.com/736x/22/1e/ad/221ead000e09cd502e2b66a38fe13279.jpg","https://i.pinimg.com/736x/f9/63/d8/f963d8f3d6954e30818fee6ba3b8bfcb.jpg"]
+  }
+]
