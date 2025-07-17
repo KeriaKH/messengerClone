@@ -7,11 +7,12 @@ import {
   faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Image from "next/image";
 import { useState } from "react";
+import MenuDropdown from "./MenuDropdown";
 
 export default function SideBar({setSideBarOption}:{setSideBarOption:(option:string)=>void}) {
   const [expand, setExpand] = useState(false);
+  const [isOpen,setIsOpen]=useState(false)
   return (
     <div
       className={`h-full flex flex-col justify-between ${
@@ -46,16 +47,7 @@ export default function SideBar({setSideBarOption}:{setSideBarOption:(option:str
           expand ? "justify-between" : "flex-col space-y-5 items-center"
         }`}
       >
-        <div className={`flex items-center space-x-2 ${expand?"hover:bg-white/30 px-3 py-1 rounded-lg transition":""}`}>
-          <Image
-            src="/avatar.jpg"
-            alt="avatar"
-            width={35}
-            height={35}
-            className="rounded-full shadow-2xl"
-          />
-          {expand && <p className="text-xs">Thế Vinh</p>}
-        </div>
+        <MenuDropdown expand={expand} isOpen={isOpen} setIsOpen={setIsOpen}/>
         <FontAwesomeIcon
           icon={faExpand}
           onClick={() => setExpand(!expand)}

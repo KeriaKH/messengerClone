@@ -1,0 +1,92 @@
+import {
+  faA,
+  faArrowRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Image from "next/image";
+import { useAuth } from "./AuthContext";
+import { useRouter } from "next/navigation";
+
+export default function MenuDropdown({
+  expand,
+  isOpen,
+  setIsOpen,
+}: {
+  expand: boolean;
+  isOpen: boolean;
+  setIsOpen: (item: boolean) => void;
+}) {
+  const router=useRouter()
+  const{LogOut}=useAuth()
+  const handleLogOut=()=>{
+    LogOut()
+    router.push('/')
+  }
+
+  const menuItems = [
+    {
+      id: "customize",
+      label: "Chỉnh sửa tên",
+      icon: faA,
+      function:()=>{}
+    },
+    {
+      id: "logout",
+      label: "Đăng xuất",
+      icon: faArrowRightFromBracket,
+      function:handleLogOut
+    },
+  ];
+  return (
+    <div className="relative inline-block">
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Menu Content */}
+          <div className="absolute bottom-full left-0 right-0 ml-2 w-60 bg-[rgba(46,46,46,255)] rounded-2xl shadow z-20">
+            {/* Menu Items */}
+            <div className="p-2 max-h-96 overflow-y-auto">
+              {menuItems.map((item) => (
+                <div key={item.id}>
+                  <button
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors rounded-xl ${
+                      item.id === "logout"
+                        ? "text-red-400 hover:bg-red-900/20"
+                        : "text-gray-300 hover:bg-white/20"
+                    }`}
+                    onClick={item.function}
+                  >
+                    <FontAwesomeIcon icon={item.icon} />
+                    <span className="flex-1">{item.label}</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+      {/* Trigger Button */}
+      <div
+        className={`flex items-center space-x-2 ${
+          expand ? "hover:bg-white/30 px-3 py-1 rounded-lg transition" : ""
+        }`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <Image
+          src="/avatar.jpg"
+          alt="avatar"
+          width={35}
+          height={35}
+          className="rounded-full shadow-2xl"
+        />
+        {expand && <p className="text-xs">Thế Vinh</p>}
+      </div>
+    </div>
+  );
+}

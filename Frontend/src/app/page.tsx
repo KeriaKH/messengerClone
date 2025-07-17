@@ -1,9 +1,67 @@
 "use client";
 
-import React, { useState } from "react";
+import { useAuth } from "@/components/AuthContext";
+import { signup } from "@/services/authService";
+import { LoginData } from "@/types/customeType/loginData";
+import { signUpData } from "@/types/customeType/signUpData";
+import { useRouter } from "next/navigation";
+
+import { useEffect, useState } from "react";
 
 export default function LogSignPage() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const [loginData, setLoginData] = useState<LoginData>({
+    email: "",
+    password: "",
+  });
+  const [signUpData, setsignUpData] = useState<signUpData>({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const {isAuth,Login}=useAuth()
+
+  const handleLogin = async () => {
+    const isFilled = Object.values(loginData).every(
+      (item) => item && item.trim() !== ""
+    );
+    if (!isFilled) {
+      alert("nhập đủ thông tin");
+      return;
+    }
+    const res = await Login(loginData)
+    if ("token" in res) router.push("/home");
+    else alert(res.message);
+  };
+
+  const handleSignUp = async () => {
+    const isFilled = Object.values(signUpData).every(
+      (item) => item && item.trim() !== ""
+    );
+    if (!isFilled) {
+      alert("nhập đủ thông tin");
+      return;
+    }
+    const res = await signup(signUpData);
+    if (res._id) {
+      alert("đăng ký thành công");
+      setsignUpData({
+        name: "",
+        email: "",
+        password: "",
+      });
+      setIsLogin(true);
+      return;
+    }
+    alert(res.message);
+  };
+
+  useEffect(()=>{
+    if(isAuth)
+      router.push('/home')
+  },[isAuth,router])
+
   return (
     <div className="w-full h-full" style={{ background: "var(--gradient-bg)" }}>
       <div className="w-[60%] h-screen mx-auto flex items-center ">
@@ -18,15 +76,26 @@ export default function LogSignPage() {
               <input
                 type="text"
                 placeholder="Email"
+                value={loginData.email}
+                onChange={(e) =>
+                  setLoginData({ ...loginData, email: e.target.value })
+                }
                 className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
               />
               <input
                 type="text"
                 placeholder="Mật khẩu"
+                value={loginData.password}
+                onChange={(e) =>
+                  setLoginData({ ...loginData, password: e.target.value })
+                }
                 className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
               />
             </div>
-            <button className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[50%] text-white text-lg font-medium rounded-2xl">
+            <button
+              className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[50%] text-white text-lg font-medium rounded-2xl"
+              onClick={handleLogin}
+            >
               Đăng nhập
             </button>
           </div>
@@ -42,20 +111,35 @@ export default function LogSignPage() {
               <input
                 type="text"
                 placeholder="Tên đầy đủ"
+                value={signUpData.name}
+                onChange={(e) =>
+                  setsignUpData({ ...signUpData, name: e.target.value })
+                }
                 className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
               />
               <input
                 type="text"
                 placeholder="Email"
+                value={signUpData.email}
+                onChange={(e) =>
+                  setsignUpData({ ...signUpData, email: e.target.value })
+                }
                 className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
               />
               <input
                 type="text"
                 placeholder="Mật khẩu"
+                value={signUpData.password}
+                onChange={(e) =>
+                  setsignUpData({ ...signUpData, password: e.target.value })
+                }
                 className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
               />
             </div>
-            <button className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[50%] text-white text-lg font-medium rounded-2xl">
+            <button
+              className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[50%] text-white text-lg font-medium rounded-2xl"
+              onClick={handleSignUp}
+            >
               Đăng ký
             </button>
           </div>
