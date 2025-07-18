@@ -1,27 +1,46 @@
-import { Message } from "@/types/message";
+import { isSenderObject, Message } from "@/types/message";
 import Image from "next/image";
 import React from "react";
+import { useAuth } from "./AuthContext";
 
-export default function MessageBubble({ item }: { item: Message }) {
+export default function MessageBubble({
+  item,
+  isLast,
+  isFirst,
+}: {
+  item: Message;
+  isLast: boolean;
+  isFirst: boolean;
+}) {
+  const { user } = useAuth();
   return (
     <div
-      className={`flex items-end space-x-2 ${
-        item.sender === "user" ? "justify-end" : "justify-start"
+      className={`flex items-end space-x-2 ${isFirst&&"mt-3"} ${
+        isSenderObject(item.sender) && item.sender._id === user?.id
+          ? "justify-end"
+          : "justify-start"
       }`}
     >
-      {item.sender !== "user" && (
-        <Image
-          src={item.avatar || "/avatar.jpg"}
-          alt="avatar"
-          width={30}
-          height={30}
-          className="rounded-full"
-        />
+      {isLast ? (
+        isSenderObject(item.sender) &&
+        item.sender._id !== user?.id && (
+          <Image
+            src={item.sender.avatar || "/avatar.jpg"}
+            alt="avatar"
+            width={30}
+            height={30}
+            className="rounded-full"
+          />
+        )
+      ) : (
+        <div className="w-[30px]"></div>
       )}
 
       <div
         className={` max-w-[40%] space-y-0.5 flex flex-col ${
-          item.sender === "user" ? "items-end" : "items-start"
+          isSenderObject(item.sender) && item.sender._id === user?.id
+            ? "items-end"
+            : "items-start"
         }`}
       >
         <div
@@ -30,7 +49,7 @@ export default function MessageBubble({ item }: { item: Message }) {
               ? "grid-cols-3"
               : "grid-cols-1"
           }`}
-          style={{ direction: item.sender==="user"?'rtl':'ltr' }}
+          style={{ direction: item.sender === user?.id ? "rtl" : "ltr" }}
         >
           {item.images?.map((img, index) => {
             const isLarge = (item.images?.length || 0) < 2;
@@ -39,7 +58,9 @@ export default function MessageBubble({ item }: { item: Message }) {
               <div
                 key={index}
                 className={`rounded-xl ${
-                  item.sender === "user" ? "justify-end flex" : ""
+                  isSenderObject(item.sender) && item.sender._id === user?.id
+                    ? "justify-end flex"
+                    : ""
                 } overflow-hidden ${
                   isLarge ? "max-w-[200px] max-h-[200px]" : "h-[120px] w-full"
                 }`}
@@ -60,18 +81,29 @@ export default function MessageBubble({ item }: { item: Message }) {
             );
           })}
         </div>
-        <p
-          className={`p-2 rounded-2xl shadow w-fit text-sm ${
-            item.sender === "user" ? "bg-blue-500" : "bg-gray-500"
-          }`}
-          style={{
-            wordBreak: "break-word", // ✨ Đây là chìa khóa
-            whiteSpace: "pre-wrap", // ✨ Kết hợp với pre-wrap
-            overflowWrap: "break-word", // ✨ Đảm bảo ngắt được từ dài
-          }}
-        >
-          {item.text}
-        </p>
+        <div>
+          {isFirst && (
+            <p className="text-xs ml-2 text-white/30">
+              {isSenderObject(item.sender) &&
+                item.sender._id !== user?.id &&
+                item.sender.name}
+            </p>
+          )}
+          <p
+            className={`p-2 rounded-2xl shadow w-fit text-sm ${
+              isSenderObject(item.sender) && item.sender._id === user?.id
+                ? "bg-blue-500"
+                : "bg-gray-500"
+            }`}
+            style={{
+              wordBreak: "break-word", // ✨ Đây là chìa khóa
+              whiteSpace: "pre-wrap", // ✨ Kết hợp với pre-wrap
+              overflowWrap: "break-word", // ✨ Đảm bảo ngắt được từ dài
+            }}
+          >
+            {item.text}
+          </p>
+        </div>
       </div>
     </div>
   );

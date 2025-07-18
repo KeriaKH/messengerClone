@@ -16,8 +16,9 @@ export default function MenuDropdown({
   isOpen: boolean;
   setIsOpen: (item: boolean) => void;
 }) {
+  
   const router=useRouter()
-  const{LogOut}=useAuth()
+  const{LogOut,user}=useAuth()
   const handleLogOut=()=>{
     LogOut()
     router.push('/')
@@ -38,7 +39,7 @@ export default function MenuDropdown({
     },
   ];
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block flex-1">
       {/* Dropdown Menu */}
       {isOpen && (
         <>
@@ -79,13 +80,13 @@ export default function MenuDropdown({
         onClick={() => setIsOpen(!isOpen)}
       >
         <Image
-          src="/avatar.jpg"
+          src={user?.avatar||'/avatar.jpg'}
           alt="avatar"
           width={35}
           height={35}
           className="rounded-full shadow-2xl"
         />
-        {expand && <p className="text-xs">Thế Vinh</p>}
+        {expand && <p className="text-xs">{user?.name}</p>}
       </div>
     </div>
   );

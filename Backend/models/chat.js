@@ -7,6 +7,7 @@ const chatSchema = mongoose.Schema(
     members: {
       type: [
         {
+          _id:false,
           id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "user",
@@ -14,6 +15,7 @@ const chatSchema = mongoose.Schema(
           },
           nickName: { type: String },
         },
+        
       ],
     },
     admin: { type: mongoose.Schema.Types.ObjectId, ref: "user" },

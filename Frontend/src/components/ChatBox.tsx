@@ -16,27 +16,36 @@ import EmojiPicker from "emoji-picker-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import MessageBubble from "./MessageBubble";
+import { useAuth } from "./AuthContext";
+import { getMessage } from "@/services/chatService";
+import { chat } from "@/types/chat";
+import {
+  formatTimeAgoWithChat,
+  getChatName,
+  getChatOnline,
+} from "@/utils/fomart";
 
 export default function ChatBox({
   setOpenProfile,
   openProfile,
+  chat,
 }: {
   setOpenProfile: (item: boolean) => void;
   openProfile: boolean;
+  chat: chat;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetch("/messages.json")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setMessages(data);
-      });
-  }, []);
+    getMessage(chat._id).then((res) => {
+      console.log(res.reverse());
+      setMessages(res);
+    });
+  }, [chat._id]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
@@ -49,10 +58,12 @@ export default function ChatBox({
   const handleSend = () => {
     const trimmedText = text.trim();
     if (!trimmedText) return;
+    if (!user?.id) return;
     const newMsg: Message = {
+      chatId: chat._id,
       text: trimmedText,
-      sender: "user",
-      time: new Date().toLocaleTimeString([], {
+      sender: user.id,
+      createdAt: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -63,10 +74,12 @@ export default function ChatBox({
   };
 
   const handleSendEmoji = () => {
+    if (!user?.id) return;
     const newMsg: Message = {
+      chatId: chat._id,
       text: "👍",
-      sender: "user",
-      time: new Date().toLocaleTimeString([], {
+      sender: user.id,
+      createdAt: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -77,16 +90,25 @@ export default function ChatBox({
   return (
     <div className="flex-1 h-full bg-[rgba(31,31,31,255)] rounded-2xl flex flex-col">
       <div className="w-full p-2 px-5 flex items-center space-x-2 shadow">
-        <Image
-          src="/avatar.jpg"
-          alt="avatar"
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
+        <div className="relative w-[40px] h-[40px]">
+          <Image
+            src="/avatar.jpg"
+            alt="avatar"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          {getChatOnline(chat, user?.id || "") && (
+            <div className="absolute bottom-0 right-0 size-3.5 rounded-full bg-green-700 border-2 border-black shadow"></div>
+          )}
+        </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold">Thế Vinh</p>
-          <p className="text-sm text-white/30 truncate">Đang hoạt động</p>
+          <p className="font-semibold">{getChatName(chat, user?.id || "")}</p>
+          <p className="text-sm text-white/30 truncate">
+            {getChatOnline(chat, user?.id || "")
+              ? "Đang hoạt động"
+              : "hoạt động " + formatTimeAgoWithChat(chat, user?.id || "")}
+          </p>
         </div>
         <div>
           <FontAwesomeIcon
@@ -98,16 +120,22 @@ export default function ChatBox({
             className=" p-3 rounded-full hover:bg-white/10 "
           />
           <FontAwesomeIcon
-            icon={openProfile?faX:faEllipsis}
+            icon={openProfile ? faX : faEllipsis}
             className=" p-3 rounded-full hover:bg-white/10 "
             onClick={() => setOpenProfile(!openProfile)}
           />
         </div>
       </div>
-      <div className="p-3 flex-1 min-w-0 min-h-0 overflow-y-auto custom-scrollbar space-y-1">
-        {messages.map((item: Message, index) => (
-          <MessageBubble item={item} key={index} />
-        ))}
+      <div className="p-3 flex-1 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
+        {messages.map((item: Message, index) => {
+          const isLastFromSender =
+            index === messages.length - 1 ||
+            (messages[index + 1].sender as { _id: string })._id !== (item.sender as { _id: string })._id;
+            const isFirstFromSender =
+            index === 0 ||
+            (messages[index - 1].sender as { _id: string })._id !== (item.sender as { _id: string })._id;
+          return <MessageBubble item={item} key={index} isLast={isLastFromSender} isFirst={isFirstFromSender}/>;
+        })}
         <div ref={messagesEndRef} />
       </div>
       <div className="w-full flex items-center px-3 py-2 space-x-3 shadow">
