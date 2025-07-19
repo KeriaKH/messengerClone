@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/components/AuthContext";
+import { useAuth } from "@/components/context/AuthContext";
 import { signup } from "@/services/authService";
 import { LoginData } from "@/types/customeType/loginData";
 import { signUpData } from "@/types/customeType/signUpData";

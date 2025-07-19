@@ -60,16 +60,16 @@ export function getChatName(chat: chat, userId: string): string {
         return groupName
     }
     const user = chat.members.find(member => member.id._id !== userId)
-    if(!user)
+    if (!user)
         return ""
-    if(user.nickName.trim()!=="")
+    if (user.nickName.trim() !== "")
         return user.nickName
-    return user.id.name 
+    return user.id.name
 }
 
 export function getChatOnline(chat: chat, userId: string): boolean {
     if (chat.isGroup) {
-        const groupOnline = chat.members.some((member) => member.id.isOnline)
+        const groupOnline = chat.members.some((member) => member.id._id === userId ? false : member.id.isOnline)
         return groupOnline
     }
     const user = chat.members.find(member => member.id._id !== userId)
@@ -77,3 +77,5 @@ export function getChatOnline(chat: chat, userId: string): boolean {
         return user.id.isOnline
     return false
 }
+
+

@@ -1,7 +1,7 @@
 "use client";
 
 import AddFriendPopUp from "@/components/AddFriendPopUp";
-import { useAuth } from "@/components/AuthContext";
+import { useAuth } from "@/components/context/AuthContext";
 import ChatBox from "@/components/ChatBox";
 import ChatList from "@/components/ChatList";
 import FriendRequest from "@/components/FriendRequest";
@@ -52,7 +52,7 @@ export default function HomePage() {
             chat={selectedChat}
           />
         )}
-        {openProfile && <Profile />}
+        {openProfile && selectedChat && <Profile chat={selectedChat}/>}
       </div>
       {showPopUp && <AddFriendPopUp setshowPopUp={setshowPopUp} />}
     </>

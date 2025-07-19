@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema(
     friends: [
       { type: mongoose.Schema.Types.ObjectId, ref: "user", default: [] },
     ],
-    isOnline: { type: Boolean },
-    lastSeen: { type: Date },
+    isOnline: { type: Boolean,default:false },
+    lastSeen: { type: Date,default:Date.now },
   },
   { timestamps: true }
 );

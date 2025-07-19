@@ -1,11 +1,15 @@
 import {
   faA,
   faArrowRightFromBracket,
+  faImage,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { friend } from "@/types/friend";
+import { getUserData } from "@/services/userService";
 
 export default function MenuDropdown({
   expand,
@@ -16,27 +20,44 @@ export default function MenuDropdown({
   isOpen: boolean;
   setIsOpen: (item: boolean) => void;
 }) {
-  
-  const router=useRouter()
-  const{LogOut,user}=useAuth()
-  const handleLogOut=()=>{
-    LogOut()
-    router.push('/')
-  }
+  console.log("hello")
+  const router = useRouter();
+  const { LogOut, user } = useAuth();
+  const [userData, setUserData] = useState<friend | null>(null);
+
+  useEffect(() => {
+    if(!user) return
+    getUserData(user?.id).then((res) => {
+      console.log(res);
+      setUserData(res);
+    });
+  }, [user]);
+
+  const handleLogOut = () => {
+    LogOut();
+    router.push("/");
+  };
 
   const menuItems = [
     {
       id: "customize",
       label: "Chỉnh sửa tên",
       icon: faA,
-      function:()=>{}
+      function: () => {},
+    },
+    {
+      id: "customizeImage",
+      label: "Thay ảnh đại diện",
+      icon: faImage,
+      function: ()=>{},
     },
     {
       id: "logout",
       label: "Đăng xuất",
       icon: faArrowRightFromBracket,
-      function:handleLogOut
+      function: handleLogOut,
     },
+    
   ];
   return (
     <div className="relative inline-block flex-1">
@@ -80,13 +101,13 @@ export default function MenuDropdown({
         onClick={() => setIsOpen(!isOpen)}
       >
         <Image
-          src={user?.avatar||'/avatar.jpg'}
+          src={userData?.avatar || "/avatar.jpg"}
           alt="avatar"
           width={35}
           height={35}
-          className="rounded-full shadow-2xl"
+          className="rounded-full shadow-2xl object-cover w-[35px] h-[35px]"
         />
-        {expand && <p className="text-xs">{user?.name}</p>}
+        {expand && <p className="text-xs">{userData?.name}</p>}
       </div>
     </div>
   );

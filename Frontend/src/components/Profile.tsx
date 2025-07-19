@@ -1,43 +1,71 @@
 "use client";
 
-import Image from "next/image";
-import React from "react";
-import CustomSelect from "./CustomSelect";
+import { chat } from "@/types/chat";
 import { Option } from "@/types/customeType/customSelect";
-import { faA, faPalette, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  formatTimeAgoWithChat,
+  getChatName,
+  getChatOnline,
+} from "@/utils/fomart";
+import { faA, faImage, faPalette, faPencil, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import ChatImage from "./ChatImage";
+import { useAuth } from "./context/AuthContext";
+import CustomSelect from "./CustomSelect";
+import MemberList from "./MemberList";
 
-export default function Profile() {
-    const chatOptions: Option[] = [
-  {
-    text: "Đổi chủ đề",
-    icon: faPalette
-  },
-  {
-    text: "Đổi biểu tượng cảm xúc",
-    icon: faThumbsUp
-  },
-  {
-    text: "Chỉnh sửa biệt danh",
-    icon: faA
-  }
-];
+export default function Profile({ chat }: { chat: chat }) {
+  const chatOptions: Option[] = [
+    {
+      text: "Đổi chủ đề",
+      icon: faPalette,
+    },
+    {
+      text: "Đổi biểu tượng cảm xúc",
+      icon: faThumbsUp,
+    },
+    {
+      text: "Chỉnh sửa biệt danh",
+      icon: faA,
+    },
+  ];
+    const chatOptions2: Option[] = [
+    {
+      text: "Đổi chủ đề",
+      icon: faPalette,
+    },
+    {
+      text: "Đổi biểu tượng cảm xúc",
+      icon: faThumbsUp,
+    },
+    {
+      text: "Chỉnh sửa biệt danh",
+      icon: faA,
+    },
+    {
+      text: "Đổi tên nhóm",
+      icon: faPencil,
+    },
+    {
+      text: "Đổi ảnh nhóm",
+      icon: faImage,
+    },
+  ];
+  const { user } = useAuth();
   return (
     <div className="h-full w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-5 flex flex-col items-center">
-      <div className="space-y-3 flex flex-col items-center">
-        <Image
-          src="/avatar.jpg"
-          alt="avatar"
-          width={70}
-          height={70}
-          className="rounded-full"
-        />
-        <div className="text-center">
-          <p className="text-xl font-semibold">Lưu Nguyễn Thế Vinh</p>
-          <p className="text-white/30 text-sm">luuvinh909@gmail.com</p>
-        </div>
-        <p className="text-white/30">Đang hoạt động</p>
+      <div className="space-y-1 flex flex-col items-center">
+        <ChatImage chat={chat}/>
+        <p className="text-xl font-semibold text-center">
+          {getChatName(chat, user?.id || "")}
+        </p>
+        <p className="text-sm text-white/30 truncate">
+          {getChatOnline(chat, user?.id || "")
+            ? "Đang hoạt động"
+            : "hoạt động " + formatTimeAgoWithChat(chat, user?.id || "")}
+        </p>
       </div>
-      <CustomSelect title="Tùy chỉnh đoạn chat" options={chatOptions}/>
+      <CustomSelect title="Tùy chỉnh đoạn chat" options={chat.isGroup?chatOptions2:chatOptions} />
+      {chat.isGroup&&<MemberList title="Danh sách thành viên" members={chat.members}/>}
     </div>
   );
 }

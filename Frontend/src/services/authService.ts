@@ -9,9 +9,7 @@ export const login = async (email: string, password: string):Promise<userData|{ 
         if (res.data.token) {
             const userData: userData = {
                 id: res.data.user._id,
-                name: res.data.user.name,
                 token: res.data.token,
-                avatar: res.data.user.avatar,
                 email: email,
                 expiresAt: new Date().getTime() + 24 * 60 * 60 * 1000,
             };

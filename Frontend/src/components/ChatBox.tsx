@@ -1,6 +1,13 @@
 "use client";
 
+import { getMessage } from "@/services/chatService";
+import { chat } from "@/types/chat";
 import { Message } from "@/types/message";
+import {
+  formatTimeAgoWithChat,
+  getChatName,
+  getChatOnline,
+} from "@/utils/fomart";
 import {
   faEllipsis,
   faFaceSmile,
@@ -13,17 +20,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmojiPicker from "emoji-picker-react";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import ChatImage from "./ChatImage";
 import MessageBubble from "./MessageBubble";
-import { useAuth } from "./AuthContext";
-import { getMessage } from "@/services/chatService";
-import { chat } from "@/types/chat";
-import {
-  formatTimeAgoWithChat,
-  getChatName,
-  getChatOnline,
-} from "@/utils/fomart";
+import { useAuth } from "./context/AuthContext";
 
 export default function ChatBox({
   setOpenProfile,
@@ -90,18 +90,7 @@ export default function ChatBox({
   return (
     <div className="flex-1 h-full bg-[rgba(31,31,31,255)] rounded-2xl flex flex-col">
       <div className="w-full p-2 px-5 flex items-center space-x-2 shadow">
-        <div className="relative w-[40px] h-[40px]">
-          <Image
-            src="/avatar.jpg"
-            alt="avatar"
-            width={40}
-            height={40}
-            className="rounded-full"
-          />
-          {getChatOnline(chat, user?.id || "") && (
-            <div className="absolute bottom-0 right-0 size-3.5 rounded-full bg-green-700 border-2 border-black shadow"></div>
-          )}
-        </div>
+        <ChatImage chat={chat}/>
         <div className="flex-1 min-w-0">
           <p className="font-semibold">{getChatName(chat, user?.id || "")}</p>
           <p className="text-sm text-white/30 truncate">

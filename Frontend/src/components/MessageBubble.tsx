@@ -1,7 +1,7 @@
 import { isSenderObject, Message } from "@/types/message";
 import Image from "next/image";
 import React from "react";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./context/AuthContext";
 
 export default function MessageBubble({
   item,
@@ -29,7 +29,7 @@ export default function MessageBubble({
             alt="avatar"
             width={30}
             height={30}
-            className="rounded-full"
+            className="rounded-full object-cover w-[30px] h-[30px]"
           />
         )
       ) : (

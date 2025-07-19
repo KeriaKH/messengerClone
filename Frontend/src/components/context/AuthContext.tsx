@@ -1,6 +1,7 @@
   "use client";
 
   import { getUserData, isLogin, login, logOut } from "@/services/authService";
+import { getSocket } from "@/socket/socket";
   import { AuthContextType } from "@/types/customeType/AuthContextType";
   import { LoginData } from "@/types/customeType/loginData";
   import { userData } from "@/types/customeType/userData";
@@ -12,6 +13,7 @@
     const [user, setUser] = useState<userData | null>(null);
     const [loading, setLoading] = useState(true); // Thêm loading state
     const [mounted, setMounted] = useState(false); // Thêm mounted state
+    const socket = getSocket();
 
     useEffect(() => {
       setMounted(true);
@@ -20,6 +22,7 @@
           if (isLogin()) {
             const userData = getUserData();
             setUser(userData);
+            socket.emit("user_connected", userData?.id);
           }
         } catch (error) {
           console.error("Error checking auth:", error);
@@ -30,17 +33,23 @@
 
       const timer = setTimeout(checkAuth, 100);
 
-      return () => clearTimeout(timer);
-    }, []);
+      return () => {
+        clearTimeout(timer)
+      };
+    },[socket]);
 
     const Login = async (loginData: LoginData) => {
       const res = await login(loginData.email, loginData.password);
-      if ("token" in res) setUser(res as userData);
+      if ("token" in res) {
+        setUser(res as userData);
+        socket.emit("user_connected", res.id);
+      }
       return res;
     };
 
     const LogOut = () => {
       logOut();
+      socket.disconnect();
       setUser(null);
     };
 
