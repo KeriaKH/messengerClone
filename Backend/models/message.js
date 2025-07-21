@@ -13,9 +13,9 @@ const messageSchema = mongoose.Schema(
       required: true,
     },
     text: { type: String, required: true },
-    images: [{ type: String }],
+    images: { type: [String], default: [] },
   },
   { timestamps: true }
-); 
+);
 
-module.exports=mongoose.model('message',messageSchema)
+module.exports = mongoose.model("message", messageSchema);

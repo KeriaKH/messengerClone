@@ -1,24 +1,37 @@
 "use client";
 
 import AddFriendPopUp from "@/components/AddFriendPopUp";
-import { useAuth } from "@/components/context/AuthContext";
 import ChatBox from "@/components/ChatBox";
 import ChatList from "@/components/ChatList";
+import { useAuth } from "@/components/context/AuthContext";
+import CreateNewChat from "@/components/CreateNewChat";
 import FriendRequest from "@/components/FriendRequest";
 import ListFriend from "@/components/ListFriend";
 import Profile from "@/components/Profile";
 import SideBar from "@/components/SideBar";
+import { createChat } from "@/services/chatService";
+import { getChat } from "@/services/userService";
 import { chat } from "@/types/chat";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
   const [openProfile, setOpenProfile] = useState(false);
   const [sideBarOption, setSideBarOption] = useState("message");
-  const [showPopUp, setshowPopUp] = useState(false);
+  const [showAddFriendPopUp, setshowAddFriendPopUp] = useState(false);
+  const [showCreateChatPopUp, setshowCreateChatPopUp] = useState(false);
   const [selectedChat, setSelectedChat] = useState<chat | null>(null);
-  const { isAuth } = useAuth();
+  const [chats, setChats] = useState<chat[] | null>(null); // Lift up state
+  const { isAuth, user } = useAuth();
   const router = useRouter();
+
+  // Load chats ở HomePage
+  useEffect(() => {
+    if (!user?.id) return;
+    getChat(user.id).then((res) => {
+      setChats(res);
+    });
+  }, [user?.id]);
 
   useEffect(() => {
     if (!isAuth) router.push("/");
@@ -32,17 +45,39 @@ export default function HomePage() {
   useEffect(() => {
     if (selectedChat)
       sessionStorage.setItem("selectedChat", JSON.stringify(selectedChat));
-  },[selectedChat]);
+  }, [selectedChat]);
+
+  const handleAccept = async (selectedFriend: string[]) => {
+    if (!selectedFriend || selectedFriend.length < 2) {
+      return alert("Vui lòng chọn bạn bè để tạo chat");
+    }
+    const data = {
+      members:
+        selectedFriend?.map((item) => ({ id: item, nickName: "" })) || [],
+      isGroup: selectedFriend && selectedFriend?.length > 2,
+    };
+    console.log("data", data);
+    await createChat(data).then((res) => {
+      setSelectedChat(res);
+      setChats((prev) => (prev ? [...prev, res] : [res]));
+    });
+
+    setshowCreateChatPopUp(false);
+  };
 
   return (
     <>
       <div className="flex h-screen w-full p-5 space-x-5">
         <SideBar setSideBarOption={setSideBarOption} />
         {sideBarOption === "message" && (
-          <ChatList setSelectedChat={setSelectedChat} />
+          <ChatList
+            chats={chats} // Truyền chats xuống
+            setSelectedChat={setSelectedChat}
+            setshowPopUp={setshowCreateChatPopUp}
+          />
         )}
         {sideBarOption === "friend" && (
-          <ListFriend setshowPopUp={setshowPopUp} />
+          <ListFriend setshowPopUp={setshowAddFriendPopUp} />
         )}
         {sideBarOption === "friendRequest" && <FriendRequest />}
         {selectedChat && (
@@ -52,9 +87,17 @@ export default function HomePage() {
             chat={selectedChat}
           />
         )}
-        {openProfile && selectedChat && <Profile chat={selectedChat}/>}
+        {openProfile && selectedChat && <Profile chat={selectedChat} />}
       </div>
-      {showPopUp && <AddFriendPopUp setshowPopUp={setshowPopUp} />}
+      {showAddFriendPopUp && (
+        <AddFriendPopUp setshowPopUp={setshowAddFriendPopUp} />
+      )}
+      {showCreateChatPopUp && (
+        <CreateNewChat
+          setshowPopUp={setshowCreateChatPopUp}
+          handleAccept={handleAccept}
+        />
+      )}
     </>
   );
 }

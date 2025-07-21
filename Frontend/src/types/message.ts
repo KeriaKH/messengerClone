@@ -1,18 +1,20 @@
-type MessageSender = {
-  _id: string;
-  name: string;
-  avatar: string;
-} | string;
+export type MessageSend = {
+  chatId: string
+  text: string;
+  sender: string
+  images?: string[]
+}
 
-export type Message = {
+export type MessageReceive = {
   _id?: number;
   chatId: string
   text: string;
-  sender: MessageSender
+  sender: {
+    _id: string;
+    name: string;
+    avatar: string;
+  }
   createdAt: string;
   images?: string[]
 };
 
-export function isSenderObject(sender: MessageSender): sender is { _id: string; name: string; avatar: string } {
-  return typeof sender !== "string";
-}

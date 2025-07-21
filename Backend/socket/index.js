@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const User = require("../models/user");
 const FriendRequest = require("../models/friendRequest");
+const Message = require("../models/message");
 
 let onlineUsers = new Map();
 
@@ -36,6 +37,20 @@ const setupSocket = (server) => {
         const receiverSocketId = onlineUsers.get(receiver);
         if (receiverSocketId)
           io.to(receiverSocketId).emit("friend_request_received", newRequest);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    socket.on("send_message", async (data) => {
+      const {messageData, receiver} = data;
+      try {
+        receiver.forEach((userId) => {
+          const receiverSocketId = onlineUsers.get(userId);
+          if (receiverSocketId) {
+            io.to(receiverSocketId).emit("message_received", messageData);
+          }
+        });
       } catch (error) {
         console.log(error);
       }

@@ -1,4 +1,4 @@
-import { isSenderObject, Message } from "@/types/message";
+import { MessageReceive } from "@/types/message";
 import Image from "next/image";
 import React from "react";
 import { useAuth } from "./context/AuthContext";
@@ -8,21 +8,19 @@ export default function MessageBubble({
   isLast,
   isFirst,
 }: {
-  item: Message;
+  item: MessageReceive;
   isLast: boolean;
   isFirst: boolean;
 }) {
   const { user } = useAuth();
   return (
     <div
-      className={`flex items-end space-x-2 ${isFirst&&"mt-3"} ${
-        isSenderObject(item.sender) && item.sender._id === user?.id
-          ? "justify-end"
-          : "justify-start"
+      className={`flex items-end space-x-2 ${isFirst && "mt-3"} ${
+        item.sender._id === user?.id ? "justify-end" : "justify-start"
       }`}
     >
       {isLast ? (
-        isSenderObject(item.sender) &&
+        
         item.sender._id !== user?.id && (
           <Image
             src={item.sender.avatar || "/avatar.jpg"}
@@ -38,7 +36,7 @@ export default function MessageBubble({
 
       <div
         className={` max-w-[40%] space-y-0.5 flex flex-col ${
-          isSenderObject(item.sender) && item.sender._id === user?.id
+           item.sender._id === user?.id
             ? "items-end"
             : "items-start"
         }`}
@@ -49,7 +47,7 @@ export default function MessageBubble({
               ? "grid-cols-3"
               : "grid-cols-1"
           }`}
-          style={{ direction: item.sender === user?.id ? "rtl" : "ltr" }}
+          style={{ direction: item.sender._id === user?.id ? "rtl" : "ltr" }}
         >
           {item.images?.map((img, index) => {
             const isLarge = (item.images?.length || 0) < 2;
@@ -58,7 +56,7 @@ export default function MessageBubble({
               <div
                 key={index}
                 className={`rounded-xl ${
-                  isSenderObject(item.sender) && item.sender._id === user?.id
+                   item.sender._id === user?.id
                     ? "justify-end flex"
                     : ""
                 } overflow-hidden ${
@@ -84,14 +82,14 @@ export default function MessageBubble({
         <div>
           {isFirst && (
             <p className="text-xs ml-2 text-white/30">
-              {isSenderObject(item.sender) &&
+              {
                 item.sender._id !== user?.id &&
                 item.sender.name}
             </p>
           )}
           <p
             className={`p-2 rounded-2xl shadow w-fit text-sm ${
-              isSenderObject(item.sender) && item.sender._id === user?.id
+               item.sender._id === user?.id
                 ? "bg-blue-500"
                 : "bg-gray-500"
             }`}

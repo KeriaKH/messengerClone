@@ -16,16 +16,17 @@ export default function ChatCard({
       className="w-full p-3 flex items-center space-x-2 hover:bg-white/10 rounded-xl transition"
       onClick={() => setSelectedChat(item)}
     >
-      <ChatImage chat={item}/>
+      <ChatImage chat={item} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold">{getChatName(item, user?.id || "")}</p>
         <p className="text-sm text-white/30 truncate">
-          {item.lastMessage.text}
+          {item?.lastMessage?.text || ""}
         </p>
       </div>
       <p className="text-sm text-white/30 text-end">
-        {formatTimeAgo(item.lastMessage.createdAt)}
+        {item.lastMessage?formatTimeAgo(item?.lastMessage?.createdAt):""}
       </p>
     </div>
   );
-}
+} 
+  

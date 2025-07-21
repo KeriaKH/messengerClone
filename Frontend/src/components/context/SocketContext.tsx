@@ -1,12 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { initSocket, getSocket } from "@/socket/socket";
+import { destroySocket, getSocket, initSocket } from "@/socket/socket";
+import React, { createContext, useContext, useState } from "react";
 import { Socket } from "socket.io-client";
 
 interface SocketContextType {
   socket: Socket | null;
   onlineUsers: string[];
+  initializeSocket: () => void;
+  disconnectSocket: () => void;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -15,30 +17,54 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
-  useEffect(() => {
-    initSocket();
-    const socketInstance = getSocket();
-    setSocket(socketInstance);
+  const initializeSocket = () => {
+    if (!socket) {
+      console.log("🔄 Initializing socket...");
+      initSocket();
+      const socketInstance = getSocket();
+      setSocket(socketInstance);
 
-    socketInstance.on("online_users", (users: string[]) => {
-      setOnlineUsers(users);
-    });
+      socketInstance.on("connect", () => {
+        console.log("✅ Socket connected:", socketInstance.id);
+      });
 
-    socketInstance.on("user_offline", (userId: string) => {
-      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
-    });
+      socketInstance.on("online_users", (users: string[]) => {
+        console.log("📋 Received online users:", users);
+        setOnlineUsers(users);
+      });
 
-    return () => {
-      socketInstance.disconnect();
-      socketInstance.off("online_users");
-      socketInstance.off("user_offline");
-    };
-  }, []);
+      socketInstance.on("user_offline", (userId: string) => {
+        console.log("🔴 User offline:", userId);
+        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+      });
 
-  if (!socket) return null;
+      socketInstance.on("disconnect", () => {
+        console.log("🔴 Socket disconnected");
+      });
+    }
+  };
+
+  const disconnectSocket = () => {
+    if (socket) {
+    console.log("🔴 Disconnecting socket...");
+    
+    // ✅ Remove listeners từ React state
+    socket.off("online_users");
+    socket.off("user_offline");
+    socket.off("connect");
+    socket.off("disconnect");
+    
+    // ✅ Destroy socket hoàn toàn
+    destroySocket();
+    
+    setSocket(null);
+    setOnlineUsers([]);
+    }
+  };
+  
 
   return (
-    <SocketContext.Provider value={{ socket, onlineUsers }}>
+    <SocketContext.Provider value={{ socket, onlineUsers, initializeSocket, disconnectSocket }}>
       {children}
     </SocketContext.Provider>
   );

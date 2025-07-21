@@ -1,9 +1,13 @@
 "use client";
 
-import { getMessage } from "@/services/chatService";
+import { getMessage, sendMessage } from "@/services/chatService";
 import { chat } from "@/types/chat";
-import { Message } from "@/types/message";
-import { formatTimeAgo, formatTimeAgoWithChat, getChatName } from "@/utils/fomart";
+import { MessageReceive, MessageSend } from "@/types/message";
+import {
+  formatTimeAgo,
+  formatTimeAgoWithChat,
+  getChatName,
+} from "@/utils/fomart";
 import {
   faEllipsis,
   faFaceSmile,
@@ -21,6 +25,7 @@ import ChatImage from "./ChatImage";
 import MessageBubble from "./MessageBubble";
 import { useAuth } from "./context/AuthContext";
 import { useSocket } from "./context/SocketContext";
+import { getSocket } from "@/socket/socket";
 
 export default function ChatBox({
   setOpenProfile,
@@ -31,12 +36,13 @@ export default function ChatBox({
   openProfile: boolean;
   chat: chat;
 }) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageReceive[]>([]);
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const { onlineUsers } = useSocket();
+  const socket = getSocket();
 
   const ChatOnline = useMemo(() => {
     return chat.isGroup
@@ -68,6 +74,18 @@ export default function ChatBox({
     });
   }, [chat._id]);
 
+  useEffect(() => {
+    const handleReceiveMessage = (data: MessageReceive) => {
+      console.log("Received message:", data);
+      setMessages((prev) => [...prev, data]);
+    };
+    socket.on("message_received", handleReceiveMessage);
+
+    return () => {
+      socket.off("message_received", handleReceiveMessage);
+    };
+  }, [socket]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   };
@@ -76,37 +94,38 @@ export default function ChatBox({
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmedText = text.trim();
     if (!trimmedText) return;
     if (!user?.id) return;
-    const newMsg: Message = {
+    const newMsg: MessageSend = {
       chatId: chat._id,
       text: trimmedText,
       sender: user.id,
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
     };
+    const receiver = chat.members.map((m) => m.id._id);
 
-    setMessages((prev) => [...prev, newMsg]);
+    const res = await sendMessage(newMsg);
+    if (!res) return;
+    socket.emit("send_message", {
+      messageData: res,
+      receiver: receiver,
+    });
+    scrollToBottom();
     setText("");
   };
 
-  const handleSendEmoji = () => {
+  const handleSendEmoji = async () => {
     if (!user?.id) return;
-    const newMsg: Message = {
+    const newMsg: MessageSend = {
       chatId: chat._id,
       text: "👍",
       sender: user.id,
-      createdAt: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
     };
-
-    setMessages((prev) => [...prev, newMsg]);
+    const res = await sendMessage(newMsg);
+    if (!res) return;
+    setMessages((prev) => [...prev, res]);
+    scrollToBottom();
   };
   return (
     <div className="flex-1 h-full bg-[rgba(31,31,31,255)] rounded-2xl flex flex-col">
@@ -135,15 +154,12 @@ export default function ChatBox({
         </div>
       </div>
       <div className="p-3 flex-1 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
-        {messages.map((item: Message, index) => {
+        {messages.map((item: MessageReceive, index) => {
           const isLastFromSender =
             index === messages.length - 1 ||
-            (messages[index + 1].sender as { _id: string })._id !==
-              (item.sender as { _id: string })._id;
+            messages[index + 1].sender._id !== item.sender._id;
           const isFirstFromSender =
-            index === 0 ||
-            (messages[index - 1].sender as { _id: string })._id !==
-              (item.sender as { _id: string })._id;
+            index === 0 || messages[index - 1].sender._id !== item.sender._id;
           return (
             <MessageBubble
               item={item}
