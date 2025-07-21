@@ -23,3 +23,21 @@ export const sendFriendRequest = async (sender: string,receiver:string) => {
         console.log(error);
     }
 }
+
+export const addFriend = async (data: { _id: string, sender: string, receiver: string }) => {
+    try {
+        await api.post(`api/friendRequest/add`, data)
+    } catch (err) {
+        const error = err as AxiosError<{ error: string }>
+        console.log(error);
+    }
+}
+
+export const rejectFriend = async (id: string) => {
+    try {
+        await api.post(`api/friendRequest/reject/${id}`)
+    } catch (err) {
+        const error = err as AxiosError<{ error: string }>
+        console.log(error);
+    }
+}

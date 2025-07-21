@@ -22,7 +22,7 @@ export default function FriendRequestCard2({ item }: { item: friendSuggest }) {
         alt="avatar"
         width={45}
         height={45}
-        className="rounded-full"
+        className="rounded-full w-[45px] h-[45px] object-cover"
       />
       <div className="flex-1 min-w-0">
         <p className="font-semibold">{item.name}</p>

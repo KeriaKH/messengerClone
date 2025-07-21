@@ -26,7 +26,7 @@ const setupSocket = (server) => {
     socket.on("send_request", async (data) => {
       const { sender, receiver } = data;
       try {
-        console.log("đã gửi")
+        console.log("đã gửi");
         const created = await FriendRequest.create(data);
         const newRequest = await FriendRequest.findById(created._id).populate(
           "sender",
@@ -45,19 +45,18 @@ const setupSocket = (server) => {
       const disconnectedUserId = [...onlineUsers.entries()].find(
         ([_, id]) => id === socket.id
       )?.[0];
-      const lastSeen = new Date();
+
       if (disconnectedUserId) {
         onlineUsers.delete(disconnectedUserId);
         io.emit("online_users", Array.from(onlineUsers.keys()));
       }
       io.emit("user_offline", {
         userId: disconnectedUserId,
-        lastSeen,
       });
       try {
         await User.findByIdAndUpdate(disconnectedUserId, {
           isOnline: false,
-          lastSeen,
+          lastSeen: new Date(),
         });
       } catch (err) {
         console.error("❌ Error updating user to offline:", err);

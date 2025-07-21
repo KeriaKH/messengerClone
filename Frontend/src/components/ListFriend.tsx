@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FriendCard from "./FriendCard";
 import { useEffect, useState } from "react";
 import { friend } from "@/types/friend";
-import { getFriend } from "@/services/userService";
+import { deleteFriend, getFriend } from "@/services/userService";
 import { useAuth } from "./context/AuthContext";
 
 export default function ListFriend({setshowPopUp}:{setshowPopUp:(item:boolean)=>void}) {
@@ -18,6 +18,16 @@ export default function ListFriend({setshowPopUp}:{setshowPopUp:(item:boolean)=>
       setFriends(res)
     })
   },[user])
+
+  const handleDeleteFriend = async(friendId: string) => {
+    if (!user) return;
+    try {
+      await deleteFriend(user.id, friendId);
+      setFriends(friends?.filter(friend => friend._id !== friendId) || null);
+    } catch (error) {
+      console.error("Error deleting friend:", error);
+    }
+  }
   return (
     <div className="h-full w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-3 space-y-3 flex flex-col">
       <div className="text-xl font-bold flex justify-between items-center">
@@ -38,7 +48,7 @@ export default function ListFriend({setshowPopUp}:{setshowPopUp:(item:boolean)=>
       </div>
       <div className="overflow-y-auto overflow-x-hidden h-full custom-scrollbar">
         {friends?.map((item, index) => (
-          <FriendCard key={index} friend={item} />
+          <FriendCard key={index} friend={item} onDelete={handleDeleteFriend} />
         ))}
       </div>
     </div>

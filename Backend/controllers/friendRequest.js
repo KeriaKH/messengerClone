@@ -1,4 +1,5 @@
 const FriendRequest = require("../models/friendRequest");
+const User = require("../models/user");
 
 const getFriendRequest = async (req, res) => {
   const { id } = req.params;
@@ -29,4 +30,31 @@ const sendFriendRequest = async (req, res) => {
   }
 };
 
-module.exports = { getFriendRequest, sendFriendRequest };
+const addFriend=async(req,res)=>{
+  const data=req.body
+  try {
+    const user=await User.findById(data.receiver)
+    if(!user) return res.status(404).json({message:"không tìm thấy user"})
+    user.friends.push(data.sender)
+    await user.save()
+    console.log(data._id)
+    await FriendRequest.findByIdAndDelete(data._id)
+    return res.status(200).json({message:"đã kết bạn thành công"})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+const rejectFriend=async(req,res)=>{
+  const {id}=req.params
+  try {
+    await FriendRequest.findByIdAndDelete(id)
+    return res.status(200).json({message:"đã từ chối kết bạn thành công"})
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports = { getFriendRequest, sendFriendRequest, addFriend, rejectFriend };

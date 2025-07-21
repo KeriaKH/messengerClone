@@ -3,9 +3,11 @@ import { faAngleDown, faAngleRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useState } from "react";
+import { useSocket } from "./context/SocketContext";
 
 export default function MemberList({ title, members }: MemberListProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const {onlineUsers} = useSocket();
   return (
     <div className="w-full rounded-xl select-none">
       <div
@@ -33,7 +35,7 @@ export default function MemberList({ title, members }: MemberListProps) {
                   height={35}
                   className="rounded-full w-[35px] h-[35px] object-cover"
                 />
-                {item.id.isOnline && (
+                {onlineUsers.includes(item.id._id) && (
                   <div className="absolute bottom-0 right-0 size-3.5 rounded-full bg-green-700 border-2 border-black shadow"></div>
                 )}
               </div>

@@ -3,11 +3,7 @@
 import { getMessage } from "@/services/chatService";
 import { chat } from "@/types/chat";
 import { Message } from "@/types/message";
-import {
-  formatTimeAgoWithChat,
-  getChatName,
-  getChatOnline,
-} from "@/utils/fomart";
+import { formatTimeAgo, formatTimeAgoWithChat, getChatName } from "@/utils/fomart";
 import {
   faEllipsis,
   faFaceSmile,
@@ -20,10 +16,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmojiPicker from "emoji-picker-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ChatImage from "./ChatImage";
 import MessageBubble from "./MessageBubble";
 import { useAuth } from "./context/AuthContext";
+import { useSocket } from "./context/SocketContext";
 
 export default function ChatBox({
   setOpenProfile,
@@ -39,6 +36,30 @@ export default function ChatBox({
   const [showPicker, setShowPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { onlineUsers } = useSocket();
+
+  const ChatOnline = useMemo(() => {
+    return chat.isGroup
+      ? chat.members.some(
+          (member) =>
+            member.id._id !== user?.id && onlineUsers.includes(member.id._id)
+        )
+      : onlineUsers.includes(
+          chat.members.find((m) => m.id._id !== user?.id)?.id._id || ""
+        );
+  }, [chat, onlineUsers, user]);
+
+  const [lastSeen, setLastSeen] = useState(
+    formatTimeAgoWithChat(chat, user?.id || "")
+  );
+  const [wasOnline, setWasOnline] = useState(ChatOnline);
+
+  useEffect(() => {
+    if (wasOnline && !ChatOnline) {
+      setLastSeen(formatTimeAgo(new Date().toISOString()));
+    }
+    setWasOnline(ChatOnline);
+  }, [onlineUsers, wasOnline, ChatOnline]);
 
   useEffect(() => {
     getMessage(chat._id).then((res) => {
@@ -90,13 +111,11 @@ export default function ChatBox({
   return (
     <div className="flex-1 h-full bg-[rgba(31,31,31,255)] rounded-2xl flex flex-col">
       <div className="w-full p-2 px-5 flex items-center space-x-2 shadow">
-        <ChatImage chat={chat}/>
+        <ChatImage chat={chat} />
         <div className="flex-1 min-w-0">
           <p className="font-semibold">{getChatName(chat, user?.id || "")}</p>
           <p className="text-sm text-white/30 truncate">
-            {getChatOnline(chat, user?.id || "")
-              ? "Đang hoạt động"
-              : "hoạt động " + formatTimeAgoWithChat(chat, user?.id || "")}
+            {ChatOnline ? "Đang hoạt động" : "hoạt động " + lastSeen}
           </p>
         </div>
         <div>
@@ -119,11 +138,20 @@ export default function ChatBox({
         {messages.map((item: Message, index) => {
           const isLastFromSender =
             index === messages.length - 1 ||
-            (messages[index + 1].sender as { _id: string })._id !== (item.sender as { _id: string })._id;
-            const isFirstFromSender =
+            (messages[index + 1].sender as { _id: string })._id !==
+              (item.sender as { _id: string })._id;
+          const isFirstFromSender =
             index === 0 ||
-            (messages[index - 1].sender as { _id: string })._id !== (item.sender as { _id: string })._id;
-          return <MessageBubble item={item} key={index} isLast={isLastFromSender} isFirst={isFirstFromSender}/>;
+            (messages[index - 1].sender as { _id: string })._id !==
+              (item.sender as { _id: string })._id;
+          return (
+            <MessageBubble
+              item={item}
+              key={index}
+              isLast={isLastFromSender}
+              isFirst={isFirstFromSender}
+            />
+          );
         })}
         <div ref={messagesEndRef} />
       </div>

@@ -4,7 +4,7 @@ import { friend } from "@/types/friend"
 import { chat } from "@/types/chat"
 import { friendSuggest } from "@/types/friendRequest"
 
-export const getFriend = async (id: string|undefined):Promise<friend[]|null> => {
+export const getFriend = async (id: string | undefined): Promise<friend[] | null> => {
     try {
         const res = await api.get(`api/user/${id}/friend`)
         if (res.data) return res.data
@@ -16,7 +16,7 @@ export const getFriend = async (id: string|undefined):Promise<friend[]|null> => 
     }
 }
 
-export const getFriendSuggest = async (id: string|undefined):Promise<friendSuggest[]|null> => {
+export const getFriendSuggest = async (id: string | undefined): Promise<friendSuggest[] | null> => {
     try {
         const res = await api.get(`api/user/${id}/friendSuggest`)
         if (res.data) return res.data
@@ -28,7 +28,7 @@ export const getFriendSuggest = async (id: string|undefined):Promise<friendSugge
     }
 }
 
-export const getChat = async (id: string|undefined):Promise<chat[]|null> => {
+export const getChat = async (id: string | undefined): Promise<chat[] | null> => {
     try {
         const res = await api.get(`api/user/${id}/chat`)
         if (res.data) return res.data
@@ -40,7 +40,7 @@ export const getChat = async (id: string|undefined):Promise<chat[]|null> => {
     }
 }
 
-export const getUserData = async (id: string|undefined):Promise<friend|null> => {
+export const getUserData = async (id: string | undefined): Promise<friend | null> => {
     try {
         const res = await api.get(`api/user/${id}`)
         if (res.data) return res.data
@@ -49,5 +49,14 @@ export const getUserData = async (id: string|undefined):Promise<friend|null> => 
         const error = err as AxiosError<{ error: string }>
         console.log(error);
         return null
+    }
+}
+
+export const deleteFriend = async (senderId: string, receiverId: string) => {
+    try {
+        await api.delete(`api/user/friend/${senderId}/${receiverId}`)
+    } catch (err) {
+        const error = err as AxiosError<{ error: string }>
+        console.log(error);
     }
 }

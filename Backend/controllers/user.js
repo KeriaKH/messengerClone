@@ -46,33 +46,34 @@ const getChat = async (req, res) => {
   }
 };
 
-const getFriendSuggest=async(req,res)=>{
-  const {id}=req.params
+const getFriendSuggest = async (req, res) => {
+  const { id } = req.params;
   try {
     const currentUser = await User.findById(id).populate("friends");
 
-    const friendRequest=await FriendRequest.find({
-      $or:[{sender:id},{receiver:id}]
-    })
+    const friendRequest = await FriendRequest.find({
+      $or: [{ sender: id }, { receiver: id }],
+    });
 
-    const excludeIds=new Set([
+    const excludeIds = new Set([
       id.toString(),
-      ...currentUser.friends.map(f=>f._id.toString()),
-      ...friendRequest.map(f=>f.sender.toString()),
-      ...friendRequest.map(f=>f.receiver.toString())
-    ])
+      ...currentUser.friends.map((f) => f._id.toString()),
+      ...friendRequest.map((f) => f.sender.toString()),
+      ...friendRequest.map((f) => f.receiver.toString()),
+    ]);
 
-    const suggest=await User.find({
-      _id:{$nin:Array.from(excludeIds)}
-    }).limit(10).select("name avatar")
+    const suggest = await User.find({
+      _id: { $nin: Array.from(excludeIds) },
+    })
+      .limit(10)
+      .select("name avatar");
 
-    return res.status(200).json(suggest)
+    return res.status(200).json(suggest);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
   }
-
-}
+};
 
 const getUserData = async (req, res) => {
   const { id } = req.params;
@@ -88,4 +89,29 @@ const getUserData = async (req, res) => {
   }
 };
 
-module.exports = { getFriend, getChat ,getUserData,getFriendSuggest};
+const deleteFriend = async (req, res) => {
+  const { receiverId, senderId } = req.params;
+  try {
+    const [receiver,sender]=await Promise.all([
+      User.findById(receiverId),
+      User.findById(senderId)
+    ])
+
+    if (!receiver || !sender) {
+      return res.status(404).json({ message: "không tìm thấy user" });
+    }
+    receiver.friends = receiver.friends.filter(
+      (friend) => friend.toString() !== senderId
+    );
+    sender.friends = sender.friends.filter(
+      (friend) => friend.toString() !== receiverId
+    );
+    await Promise.all([receiver.save(), sender.save()]);
+    return res.status(200).json({ message: "Xóa bạn bè thành công" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { getFriend, getChat, getUserData, getFriendSuggest, deleteFriend };

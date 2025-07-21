@@ -1,12 +1,19 @@
 import { chat } from "@/types/chat";
-import { getChatOnline } from "@/utils/fomart";
+
 import Image from "next/image";
-import React from "react";
 import { useAuth } from "./context/AuthContext";
+import { useSocket } from "./context/SocketContext";
 
 export default function ChatImage({ chat }: { chat: chat }) {
   const { user } = useAuth();
   const raw = chat.members.find((item) => item.id._id !== user?.id);
+  const {onlineUsers} = useSocket();
+  const getChatOnline=()=>{
+    if(chat.isGroup) {
+      return chat.members.some(member=>member.id._id !== user?.id && onlineUsers.includes(member.id._id));
+    }
+    return onlineUsers.includes(raw?.id._id || "");
+  }
   return chat.isGroup ? (
     chat.image.trim() !== "" ? (
       <div className="relative w-[45px] h-[45px]">
@@ -17,7 +24,7 @@ export default function ChatImage({ chat }: { chat: chat }) {
           height={45}
           className="rounded-full w-[45px] h-[45px] object-cover"
         />
-        {getChatOnline(chat, user?.id || "") && (
+        {getChatOnline() && (
           <div className="absolute bottom-0 right-0 size-3.5 rounded-full bg-green-700 border-2 border-black shadow"></div>
         )}
       </div>
@@ -39,7 +46,7 @@ export default function ChatImage({ chat }: { chat: chat }) {
             className="rounded-full absolute left-0 bottom-0 w-[35px] h-[35px] object-cover"
           />
         )}
-        {getChatOnline(chat, user?.id || "") && (
+        {getChatOnline() && (
           <div className="absolute bottom-0 right-0 size-3.5 rounded-full bg-green-700 border-2 border-black shadow"></div>
         )}
       </div>
@@ -53,7 +60,7 @@ export default function ChatImage({ chat }: { chat: chat }) {
         height={45}
         className="rounded-full w-[45px] h-[45px] object-cover"
       />
-      {getChatOnline(chat, user?.id || "") && (
+      {getChatOnline() && (
         <div className="absolute bottom-0 right-0 size-3.5 rounded-full bg-green-700 border-2 border-black shadow"></div>
       )}
     </div>
