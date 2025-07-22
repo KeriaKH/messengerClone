@@ -60,3 +60,23 @@ export const deleteFriend = async (senderId: string, receiverId: string) => {
         console.log(error);
     }
 }
+
+export const ChangeName = async (userId: string, newName: string) => {
+    try {
+        const data = { id: userId, name: newName };
+        await api.put(`api/user/changeName`, data);
+    } catch (error) {
+        const err = error as AxiosError<{ error: string }>
+        console.log(err);
+    }
+}
+
+export const ChangeAvatar = async (userId: string, newAvatar: string) => {
+    try {
+        const data = { id: userId, avatar: newAvatar };
+        await api.put(`api/user/changeAvatar`, data);
+    } catch (error) {
+        const err = error as AxiosError<{ error: string }>
+        console.log(err);
+    }
+}

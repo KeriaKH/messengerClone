@@ -9,6 +9,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { useSocket } from "./SocketContext";
@@ -20,6 +21,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true); // Thêm loading state
   const [mounted, setMounted] = useState(false); // Thêm mounted state
   const { socket, initializeSocket, disconnectSocket } = useSocket();
+  const initializeSocketRef = useRef(initializeSocket);
+
+  useEffect(() => {
+    initializeSocketRef.current = initializeSocket;
+  }, [initializeSocket]);
 
   const emitUserConnected = useCallback(
     (userId: string) => {
@@ -47,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const userData = getUserData();
           setUser(userData);
           if (userData?.id) {
-            initializeSocket();
+            initializeSocketRef.current();
             setTimeout(() => {
               emitUserConnected(userData.id);
             }, 500); // Delay to ensure socket is initialized
@@ -65,7 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       clearTimeout(timer);
     };
-  }, [emitUserConnected, initializeSocket]);
+  }, [emitUserConnected]);
 
   const Login = async (loginData: LoginData) => {
     const res = await login(loginData.email, loginData.password);
@@ -91,8 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
-  if (!mounted || loading)
-    return null
+  if (!mounted || loading) return null;
 
   return (
     <AuthContext.Provider value={{ user, Login, LogOut, isAuth: !!user }}>

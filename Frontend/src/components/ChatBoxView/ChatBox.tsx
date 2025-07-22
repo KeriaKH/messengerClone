@@ -1,8 +1,9 @@
 "use client";
 
-import { getMessage, sendMessage } from "@/services/chatService";
+import { sendMessage } from "@/services/chatService";
+import { uploadImages } from "@/services/cloudinaryService";
 import { chat } from "@/types/chat";
-import { MessageReceive, MessageSend } from "@/types/message";
+import { MessageSend } from "@/types/message";
 import {
   formatTimeAgo,
   formatTimeAgoWithChat,
@@ -10,22 +11,18 @@ import {
 } from "@/utils/fomart";
 import {
   faEllipsis,
-  faFaceSmile,
-  faImage,
-  faPaperPlane,
   faPhone,
-  faThumbsUp,
   faVideo,
-  faX,
+  faX
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ChatImage from "./ChatImage";
-import MessageBubble from "./MessageBubble";
-import { useAuth } from "./context/AuthContext";
-import { useSocket } from "./context/SocketContext";
-import { getSocket } from "@/socket/socket";
+import ChatImage from "../ChatImage";
+import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
+import MessageInput from "./MessageInput";
+import MessageList from "./MessageList";
 
 export default function ChatBox({
   setOpenProfile,
@@ -36,13 +33,18 @@ export default function ChatBox({
   openProfile: boolean;
   chat: chat;
 }) {
-  const [messages, setMessages] = useState<MessageReceive[]>([]);
+
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  const { onlineUsers } = useSocket();
-  const socket = getSocket();
+  const { socket, onlineUsers } = useSocket();
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastSeen, setLastSeen] = useState(
+    formatTimeAgoWithChat(chat, user?.id || "")
+  );
 
   const ChatOnline = useMemo(() => {
     return chat.isGroup
@@ -55,11 +57,7 @@ export default function ChatBox({
         );
   }, [chat, onlineUsers, user]);
 
-  const [lastSeen, setLastSeen] = useState(
-    formatTimeAgoWithChat(chat, user?.id || "")
-  );
   const [wasOnline, setWasOnline] = useState(ChatOnline);
-
   useEffect(() => {
     if (wasOnline && !ChatOnline) {
       setLastSeen(formatTimeAgo(new Date().toISOString()));
@@ -67,45 +65,35 @@ export default function ChatBox({
     setWasOnline(ChatOnline);
   }, [onlineUsers, wasOnline, ChatOnline]);
 
-  useEffect(() => {
-    getMessage(chat._id).then((res) => {
-      console.log(res.reverse());
-      setMessages(res);
-    });
-  }, [chat._id]);
-
-  useEffect(() => {
-    const handleReceiveMessage = (data: MessageReceive) => {
-      console.log("Received message:", data);
-      setMessages((prev) => [...prev, data]);
-    };
-    socket.on("message_received", handleReceiveMessage);
-
-    return () => {
-      socket.off("message_received", handleReceiveMessage);
-    };
-  }, [socket]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   const handleSend = async () => {
-    const trimmedText = text.trim();
-    if (!trimmedText) return;
+    if (!socket) return;
     if (!user?.id) return;
+    let images: string[] = [];
+    const trimmedText = text.trim();
+    if (trimmedText === "" && selectedFiles.length === 0) return;
+    if (selectedFiles.length > 0) {
+      setIsLoading(true);
+      const raw = await uploadImages(selectedFiles);
+      if (!raw) return;
+      images = raw;
+      setSelectedFiles([]);
+      setPreviewImages([]);
+    }
     const newMsg: MessageSend = {
       chatId: chat._id,
       text: trimmedText,
       sender: user.id,
+      images,
     };
     const receiver = chat.members.map((m) => m.id._id);
 
     const res = await sendMessage(newMsg);
+    setIsLoading(false);
     if (!res) return;
     socket.emit("send_message", {
       messageData: res,
@@ -116,17 +104,24 @@ export default function ChatBox({
   };
 
   const handleSendEmoji = async () => {
+    if (!socket) return;
     if (!user?.id) return;
     const newMsg: MessageSend = {
       chatId: chat._id,
       text: "👍",
       sender: user.id,
     };
+    const receiver = chat.members.map((m) => m.id._id);
     const res = await sendMessage(newMsg);
     if (!res) return;
-    setMessages((prev) => [...prev, res]);
+    socket.emit("send_message", {
+      messageData: res,
+      receiver: receiver,
+    });
     scrollToBottom();
   };
+
+  
   return (
     <div className="flex-1 h-full bg-[rgba(31,31,31,255)] rounded-2xl flex flex-col">
       <div className="w-full p-2 px-5 flex items-center space-x-2 shadow">
@@ -153,61 +148,20 @@ export default function ChatBox({
           />
         </div>
       </div>
-      <div className="p-3 flex-1 min-w-0 min-h-0 overflow-y-auto custom-scrollbar">
-        {messages.map((item: MessageReceive, index) => {
-          const isLastFromSender =
-            index === messages.length - 1 ||
-            messages[index + 1].sender._id !== item.sender._id;
-          const isFirstFromSender =
-            index === 0 || messages[index - 1].sender._id !== item.sender._id;
-          return (
-            <MessageBubble
-              item={item}
-              key={index}
-              isLast={isLastFromSender}
-              isFirst={isFirstFromSender}
-            />
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="w-full flex items-center px-3 py-2 space-x-3 shadow">
-        <FontAwesomeIcon
-          icon={faImage}
-          className=" p-3 rounded-full hover:bg-white/10 size-5"
-        />
-        <div className=" bg-white/10 flex-1 rounded-2xl flex items-center">
-          <input
-            type="text"
-            value={text || ""}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSend();
-            }}
-            className="p-2 px-4 focus:outline-none flex-1"
-            placeholder="Aa"
-          />
-
-          <FontAwesomeIcon
-            icon={faFaceSmile}
-            onClick={() => setShowPicker(!showPicker)}
-            className=" p-3 rounded-full hover:bg-white/10 size-5"
-          />
-        </div>
-        {text.trim() === "" ? (
-          <FontAwesomeIcon
-            icon={faThumbsUp}
-            onClick={handleSendEmoji}
-            className=" p-3 rounded-full hover:bg-white/10 size-5"
-          />
-        ) : (
-          <FontAwesomeIcon
-            icon={faPaperPlane}
-            onClick={handleSend}
-            className=" p-3 rounded-full hover:bg-white/10 size-5"
-          />
-        )}
-      </div>
+      <MessageList socket={socket} chatId={chat._id} messagesEndRef={messagesEndRef} scrollToBottom={scrollToBottom} />
+      <MessageInput
+        selectedFiles={selectedFiles}
+        previewImages={previewImages}
+        setSelectedFiles={setSelectedFiles}
+        setPreviewImages={setPreviewImages} 
+        handleSend={handleSend}
+        handleSendEmoji={handleSendEmoji}
+        text={text}
+        setText={setText}
+        setShowPicker={setShowPicker}
+        showPicker={showPicker}
+        isLoading={isLoading}
+      />
       {showPicker && (
         <div className="mt-2 w-full">
           <EmojiPicker

@@ -20,7 +20,6 @@ export default function MessageBubble({
       }`}
     >
       {isLast ? (
-        
         item.sender._id !== user?.id && (
           <Image
             src={item.sender.avatar || "/avatar.jpg"}
@@ -36,11 +35,14 @@ export default function MessageBubble({
 
       <div
         className={` max-w-[40%] space-y-0.5 flex flex-col ${
-           item.sender._id === user?.id
-            ? "items-end"
-            : "items-start"
+          item.sender._id === user?.id ? "items-end" : "items-start"
         }`}
       >
+        {isFirst && (
+          <p className="text-xs ml-2 text-white/30">
+            {item.sender._id !== user?.id && item.sender.name}
+          </p>
+        )}
         <div
           className={`grid gap-0.5  ${
             item.images && item.images.length >= 1
@@ -56,9 +58,7 @@ export default function MessageBubble({
               <div
                 key={index}
                 className={`rounded-xl ${
-                   item.sender._id === user?.id
-                    ? "justify-end flex"
-                    : ""
+                  item.sender._id === user?.id ? "justify-end flex" : ""
                 } overflow-hidden ${
                   isLarge ? "max-w-[200px] max-h-[200px]" : "h-[120px] w-full"
                 }`}
@@ -80,27 +80,20 @@ export default function MessageBubble({
           })}
         </div>
         <div>
-          {isFirst && (
-            <p className="text-xs ml-2 text-white/30">
-              {
-                item.sender._id !== user?.id &&
-                item.sender.name}
+          {item.text.trim() !== "" && (
+            <p
+              className={`p-2 rounded-2xl shadow w-fit text-sm ${
+                item.sender._id === user?.id ? "bg-blue-500" : "bg-gray-500"
+              }`}
+              style={{
+                wordBreak: "break-word", // ✨ Đây là chìa khóa
+                whiteSpace: "pre-wrap", // ✨ Kết hợp với pre-wrap
+                overflowWrap: "break-word", // ✨ Đảm bảo ngắt được từ dài
+              }}
+            >
+              {item.text}
             </p>
           )}
-          <p
-            className={`p-2 rounded-2xl shadow w-fit text-sm ${
-               item.sender._id === user?.id
-                ? "bg-blue-500"
-                : "bg-gray-500"
-            }`}
-            style={{
-              wordBreak: "break-word", // ✨ Đây là chìa khóa
-              whiteSpace: "pre-wrap", // ✨ Kết hợp với pre-wrap
-              overflowWrap: "break-word", // ✨ Đảm bảo ngắt được từ dài
-            }}
-          >
-            {item.text}
-          </p>
         </div>
       </div>
     </div>

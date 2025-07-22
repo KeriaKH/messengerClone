@@ -92,10 +92,10 @@ const getUserData = async (req, res) => {
 const deleteFriend = async (req, res) => {
   const { receiverId, senderId } = req.params;
   try {
-    const [receiver,sender]=await Promise.all([
+    const [receiver, sender] = await Promise.all([
       User.findById(receiverId),
-      User.findById(senderId)
-    ])
+      User.findById(senderId),
+    ]);
 
     if (!receiver || !sender) {
       return res.status(404).json({ message: "không tìm thấy user" });
@@ -114,4 +114,46 @@ const deleteFriend = async (req, res) => {
   }
 };
 
-module.exports = { getFriend, getChat, getUserData, getFriendSuggest, deleteFriend };
+const changeName = async (req, res) => {
+  const data = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      data.id,
+      { name: data.name },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "không tìm thấy user" });
+    return res.status(200).json({ message: "Đổi tên thành công", user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const changeAvatar = async (req, res) => {
+  const data = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      data.id,
+      { avatar: data.avatar },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "không tìm thấy user" });
+    return res
+      .status(200)
+      .json({ message: "Cập nhật ảnh đại diện thành công", user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  getFriend,
+  getChat,
+  getUserData,
+  getFriendSuggest,
+  deleteFriend,
+  changeName,
+  changeAvatar,
+};

@@ -2,9 +2,9 @@ import { AxiosError } from "axios"
 import api from "./api"
 import { MessageSend } from "@/types/message"
 
-export const getMessage = async (id: string) => {
+export const getMessage = async (id: string,page: number,limit: number) => {
     try {
-        const res = await api.get(`api/chat/${id}`)
+        const res = await api.get(`api/chat/${id}?page=${page}&limit=${limit}`)
         if (res.data)
             return res.data
         return null

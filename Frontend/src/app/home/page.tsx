@@ -1,7 +1,7 @@
 "use client";
 
 import AddFriendPopUp from "@/components/AddFriendPopUp";
-import ChatBox from "@/components/ChatBox";
+import ChatBox from "@/components/ChatBoxView/ChatBox";
 import ChatList from "@/components/ChatList";
 import { useAuth } from "@/components/context/AuthContext";
 import CreateNewChat from "@/components/CreateNewChat";
@@ -29,6 +29,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!user?.id) return;
     getChat(user.id).then((res) => {
+      console.log("chats", res);
       setChats(res);
     });
   }, [user?.id]);

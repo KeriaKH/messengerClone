@@ -4,13 +4,17 @@ const mongoose = require("mongoose");
 const setupSocket=require('./socket/index')
 const http = require("http");
 const dotenv = require("dotenv");
+
+dotenv.config();
+
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
 const chatRoute=require("./routes/chat");
 const friendRequestRoute=require("./routes/friendRequest");
+const cloudinaryRoute = require("./routes/cloudinary");
 
 
-dotenv.config();
+
 
 const app = express();
 app.use(express.json());
@@ -25,6 +29,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/friendRequest", friendRequestRoute);
+app.use("/api/cloudinary", cloudinaryRoute);
 
 const Port = process.env.PORT || 5000;
 
