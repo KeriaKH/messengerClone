@@ -13,6 +13,7 @@ import {
   faPalette,
   faPencil,
   faThumbsUp,
+  faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useMemo, useState } from "react";
 import ChatImage from "./ChatImage";
@@ -20,8 +21,9 @@ import { useAuth } from "./context/AuthContext";
 import { useSocket } from "./context/SocketContext";
 import CustomSelect from "./CustomSelect";
 import MemberList from "./MemberList";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function Profile({ chat }: { chat: chat }) {
+export default function Profile({ chat,setOpenProfile }: { chat: chat,setOpenProfile: (item: boolean) => void }) {
   const chatOptions: Option[] = [
     {
       text: "Đổi chủ đề",
@@ -86,7 +88,8 @@ export default function Profile({ chat }: { chat: chat }) {
   }, [onlineUsers, wasOnline, ChatOnline]);
 
   return (
-    <div className="h-full w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-5 flex flex-col items-center">
+    <div className="h-full min-[1024px]:w-[23%] min-[1024px]:flex-none flex-1 shadow rounded-2xl bg-[rgba(31,31,31,255)] p-5 flex flex-col items-center">
+      <FontAwesomeIcon icon={faX} className="self-start hover:bg-white/30 transition p-2 rounded-full size-5" onClick={() => setOpenProfile(false)}/>
       <div className="space-y-1 flex flex-col items-center">
         <ChatImage chat={chat} />
         <p className="text-xl font-semibold text-center">

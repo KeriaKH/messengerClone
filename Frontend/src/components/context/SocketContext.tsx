@@ -1,6 +1,6 @@
 "use client";
 
-import { destroySocket, getSocket, initSocket } from "@/socket/socket";
+import { destroySocket, getSocket, initSocket } from "@/lib/socket/socket";
 import React, { createContext, useContext, useState } from "react";
 import { Socket } from "socket.io-client";
 

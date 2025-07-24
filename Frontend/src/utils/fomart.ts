@@ -11,10 +11,10 @@ export function formatTimeAgo(createdAt: string | Date): string {
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (seconds < 60) return "vừa xong";
-    if (minutes < 60) return `${minutes} phút trước`;
-    if (hours < 24) return `${hours} giờ trước`;
+    if (minutes < 60) return `${minutes} phút`;
+    if (hours < 24) return `${hours} giờ`;
     if (days === 1) return "hôm qua";
-    if (days < 7) return `${days} ngày trước`;
+    if (days < 7) return `${days} ngày`;
 
     // Nếu lâu hơn 7 ngày thì trả về định dạng ngày cụ thể
     return time.toLocaleDateString("vi-VN", {

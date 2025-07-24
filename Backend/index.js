@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const setupSocket=require('./socket/index')
 const http = require("http");
 const dotenv = require("dotenv");
-
+const { ExpressPeerServer } = require("peer");
 dotenv.config();
 
 const authRoute = require("./routes/auth");
@@ -14,9 +14,8 @@ const friendRequestRoute=require("./routes/friendRequest");
 const cloudinaryRoute = require("./routes/cloudinary");
 
 
-
-
 const app = express();
+const server = http.createServer(app);
 app.use(express.json());
 app.use(
   cors({
@@ -24,6 +23,17 @@ app.use(
     credentials: true,
   })
 );
+
+const peerServer = ExpressPeerServer(server,{
+  debug: true,
+  path: "/",
+  allow_discovery: true,
+})
+
+app.use('/peerjs', peerServer);
+
+
+setupSocket(server);
 
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
@@ -33,14 +43,11 @@ app.use("/api/cloudinary", cloudinaryRoute);
 
 const Port = process.env.PORT || 5000;
 
-const server = http.createServer(app);
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB");
 
-    setupSocket(server);
     server.listen(Port, () => {
       console.log(`🚀 Server running on http://localhost:${Port}`);
       console.log("🔗 Connected URI:", process.env.MONGO_URI);

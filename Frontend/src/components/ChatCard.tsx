@@ -35,7 +35,7 @@ export default function ChatCard({
     >
       <ChatImage chat={item} />
       <div className="flex-1 min-w-0">
-        <p className="font-semibold">{getChatName(item, user?.id || "")}</p>
+        <p className="font-semibold truncate">{getChatName(item, user?.id || "")}</p>
         <p className="text-sm text-white/30 truncate">
           {lastMessage?.text || ""}
         </p>

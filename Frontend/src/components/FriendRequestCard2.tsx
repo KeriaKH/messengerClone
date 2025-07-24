@@ -1,4 +1,4 @@
-import { getSocket } from "@/socket/socket";
+import { getSocket } from "@/lib/socket/socket";
 import { friendSuggest } from "@/types/friendRequest";
 import Image from "next/image";
 import { useState } from "react";

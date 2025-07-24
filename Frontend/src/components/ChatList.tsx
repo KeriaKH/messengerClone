@@ -15,7 +15,7 @@ export default function ChatList({
   chats: chat[] | null;
 }) {
   return (
-    <div className="h-full w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-3 space-y-3 flex flex-col">
+    <div className="h-full w-[32%] lg:w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-3 space-y-3 flex flex-col">
       <div className="text-xl font-bold flex justify-between items-center">
         <h2 className="text-2xl">Đoạn chat</h2>
         <FontAwesomeIcon

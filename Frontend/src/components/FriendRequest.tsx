@@ -9,7 +9,7 @@ import { friendRequest } from "@/types/friendRequest";
 import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import FriendRequestCard from "./FriendRequestCard";
-import { getSocket } from "@/socket/socket";
+import { getSocket } from "@/lib/socket/socket";
 
 export default function FriendRequest() {
   const { user } = useAuth();

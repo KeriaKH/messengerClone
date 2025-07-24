@@ -13,7 +13,7 @@ import {
   faEllipsis,
   faPhone,
   faVideo,
-  faX
+  faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmojiPicker from "emoji-picker-react";
@@ -33,7 +33,6 @@ export default function ChatBox({
   openProfile: boolean;
   chat: chat;
 }) {
-
   const [text, setText] = useState("");
   const [showPicker, setShowPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -68,7 +67,6 @@ export default function ChatBox({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   };
-
 
   const handleSend = async () => {
     if (!socket) return;
@@ -121,7 +119,21 @@ export default function ChatBox({
     scrollToBottom();
   };
 
-  
+  const handlePhoneCall = (type: "audio" | "video") => {
+    const width = 800;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    const receiver =
+      chat.members.find((m) => m.id._id !== user?.id)?.id._id || "";
+    if (!receiver) return;
+    if (!socket) return;
+    socket?.emit("call_request", receiver, user?.id,type);
+
+    const features = `width=${width},height=${height},left=${left},top=${top},resizable=yes`;
+    window.open(`/call?receiver=${receiver}&type=${type}&isCaller=true`, "phoneCall", features);
+  };
+
   return (
     <div className="flex-1 h-full bg-[rgba(31,31,31,255)] rounded-2xl flex flex-col">
       <div className="w-full p-2 px-5 flex items-center space-x-2 shadow">
@@ -136,10 +148,12 @@ export default function ChatBox({
           <FontAwesomeIcon
             icon={faPhone}
             className=" p-3 rounded-full hover:bg-white/10 "
+            onClick={() => handlePhoneCall("audio")}
           />
           <FontAwesomeIcon
             icon={faVideo}
             className=" p-3 rounded-full hover:bg-white/10 "
+            onClick={() => handlePhoneCall("video")}
           />
           <FontAwesomeIcon
             icon={openProfile ? faX : faEllipsis}
@@ -148,12 +162,17 @@ export default function ChatBox({
           />
         </div>
       </div>
-      <MessageList socket={socket} chatId={chat._id} messagesEndRef={messagesEndRef} scrollToBottom={scrollToBottom} />
+      <MessageList
+        socket={socket}
+        chatId={chat._id}
+        messagesEndRef={messagesEndRef}
+        scrollToBottom={scrollToBottom}
+      />
       <MessageInput
         selectedFiles={selectedFiles}
         previewImages={previewImages}
         setSelectedFiles={setSelectedFiles}
-        setPreviewImages={setPreviewImages} 
+        setPreviewImages={setPreviewImages}
         handleSend={handleSend}
         handleSendEmoji={handleSendEmoji}
         text={text}

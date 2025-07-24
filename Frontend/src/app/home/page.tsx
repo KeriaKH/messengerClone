@@ -1,14 +1,17 @@
 "use client";
 
 import AddFriendPopUp from "@/components/AddFriendPopUp";
+import CallPopUp from "@/components/CallPopUp";
 import ChatBox from "@/components/ChatBoxView/ChatBox";
 import ChatList from "@/components/ChatList";
 import { useAuth } from "@/components/context/AuthContext";
+import { useSocket } from "@/components/context/SocketContext";
 import CreateNewChat from "@/components/CreateNewChat";
 import FriendRequest from "@/components/FriendRequest";
 import ListFriend from "@/components/ListFriend";
 import Profile from "@/components/Profile";
 import SideBar from "@/components/SideBar";
+import { useWindowSize } from "@/components/UseWindowSize";
 import { createChat } from "@/services/chatService";
 import { getChat } from "@/services/userService";
 import { chat } from "@/types/chat";
@@ -20,12 +23,20 @@ export default function HomePage() {
   const [sideBarOption, setSideBarOption] = useState("message");
   const [showAddFriendPopUp, setshowAddFriendPopUp] = useState(false);
   const [showCreateChatPopUp, setshowCreateChatPopUp] = useState(false);
+  const [callReceive, setCallReceive] = useState(false);
+  const [whoCalled, setWhoCalled] = useState<string | null>(null);
+  const [callType, setCallType] = useState<string | null>(null);
   const [selectedChat, setSelectedChat] = useState<chat | null>(null);
-  const [chats, setChats] = useState<chat[] | null>(null); // Lift up state
+  const [chats, setChats] = useState<chat[] | null>(null);
   const { isAuth, user } = useAuth();
+  const { socket } = useSocket();
+  const { width } = useWindowSize();
   const router = useRouter();
 
-  // Load chats ở HomePage
+  const isSmallScreen = width < 1024;
+
+  const shouldHideChatBox = isSmallScreen && openProfile;
+
   useEffect(() => {
     if (!user?.id) return;
     getChat(user.id).then((res) => {
@@ -47,6 +58,31 @@ export default function HomePage() {
     if (selectedChat)
       sessionStorage.setItem("selectedChat", JSON.stringify(selectedChat));
   }, [selectedChat]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleReceiveCall = (data: { from: string,type:string }) => {
+      setCallReceive(true);
+      setWhoCalled(data.from);
+      setCallType(data.type);
+    };
+    socket.on("incoming_call", handleReceiveCall);
+    return () => {
+      socket.off("incoming_call", handleReceiveCall);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleStopCall = () => {
+      setCallReceive(false);
+      setWhoCalled(null);
+    };
+    socket.on("call_ended_before_accept", handleStopCall);
+    return () => {
+      socket.off("call_ended_before_accept", handleStopCall);
+    };
+  }, [socket]);
 
   const handleAccept = async (selectedFriend: string[]) => {
     if (!selectedFriend || selectedFriend.length < 2) {
@@ -72,7 +108,7 @@ export default function HomePage() {
         <SideBar setSideBarOption={setSideBarOption} />
         {sideBarOption === "message" && (
           <ChatList
-            chats={chats} // Truyền chats xuống
+            chats={chats}
             setSelectedChat={setSelectedChat}
             setshowPopUp={setshowCreateChatPopUp}
           />
@@ -81,14 +117,14 @@ export default function HomePage() {
           <ListFriend setshowPopUp={setshowAddFriendPopUp} />
         )}
         {sideBarOption === "friendRequest" && <FriendRequest />}
-        {selectedChat && (
+        {selectedChat && !shouldHideChatBox && (
           <ChatBox
             openProfile={openProfile}
             setOpenProfile={setOpenProfile}
             chat={selectedChat}
           />
         )}
-        {openProfile && selectedChat && <Profile chat={selectedChat} />}
+        {openProfile && selectedChat && <Profile chat={selectedChat} setOpenProfile={setOpenProfile} />}
       </div>
       {showAddFriendPopUp && (
         <AddFriendPopUp setshowPopUp={setshowAddFriendPopUp} />
@@ -98,6 +134,9 @@ export default function HomePage() {
           setshowPopUp={setshowCreateChatPopUp}
           handleAccept={handleAccept}
         />
+      )}
+      {callReceive && (
+        <CallPopUp setCallReceive={setCallReceive} whoCalled={whoCalled} callType={callType} />
       )}
     </>
   );
