@@ -11,6 +11,7 @@ const setupSocket = (server) => {
       methods: ["GET", "POST"],
       credentials: true,
     },
+    transports: ['websocket', 'polling'],
   });
 
   io.on("connection", (socket) => {

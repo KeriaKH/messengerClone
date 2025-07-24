@@ -91,7 +91,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       socket.emit("user_disconnected", user.id);
     }
 
-    // ✅ Disconnect socket khi logout
     disconnectSocket();
     logOut();
     setUser(null);

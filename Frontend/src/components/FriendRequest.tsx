@@ -47,7 +47,7 @@ export default function FriendRequest() {
   };
 
   return (
-    <div className="h-full w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-3 space-y-3 flex flex-col">
+    <div className="h-full w-[32%] lg:w-[23%] shadow rounded-2xl bg-[rgba(31,31,31,255)] p-3 space-y-3 flex flex-col">
       <h2 className="text-2xl font-bold">Lời mời kết bạn</h2>
       <div className="overflow-y-auto overflow-x-hidden h-[45%] custom-scrollbar">
         {FriendRequest?.map((item, index) => (

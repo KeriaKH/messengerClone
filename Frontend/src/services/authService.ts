@@ -42,6 +42,7 @@ export const signup = async (userData: signUpData) => {
 
 export const logOut = () => {
     try {
+        sessionStorage.removeItem("selectedChat");
         localStorage.removeItem('userData')
     } catch (err: unknown) {
         const error = err as AxiosError<{ error: string }>

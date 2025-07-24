@@ -16,7 +16,7 @@ export default function SideBar({setSideBarOption}:{setSideBarOption:(option:str
   return (
     <div
       className={`h-full flex flex-col justify-between ${
-        expand ? " w-[10%]" : "w-[2%] items-center"
+        expand ? " w-45" : "w-[2%] items-center"
       }`}
     >
       <div className="flex flex-col space-y-5">

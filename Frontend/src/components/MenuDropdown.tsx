@@ -152,13 +152,15 @@ export default function MenuDropdown({
           }`}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <Image
-            src={userData?.avatar || "/avatar.jpg"}
-            alt="avatar"
-            width={35}
-            height={35}
-            className="rounded-full shadow-2xl object-cover w-[35px] h-[35px]"
-          />
+          <div className="flex-shrink-0"> 
+            <Image
+              src={userData?.avatar || "/avatar.jpg"}
+              alt="avatar"
+              width={35}
+              height={35}
+              className="rounded-full shadow object-cover w-[35px] h-[35px] min-w-[35px] min-h-[35px]" // ✅ Thêm min-width/height
+            />
+          </div>
           {expand && <p className="text-xs">{userData?.name}</p>}
         </div>
       </div>

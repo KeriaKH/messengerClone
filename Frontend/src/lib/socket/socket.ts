@@ -4,9 +4,10 @@
 
   export const initSocket = () => {
     if (!socket) {
-      socket = io("http://localhost:5000", {
+      socket = io(process.env.NEXT_PUBLIC_API_URL, {
         withCredentials: true,
-        forceNew:true
+        transports: ["polling"],
+        forceNew:false
       });
     }
   };

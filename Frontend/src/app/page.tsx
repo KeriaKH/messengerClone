@@ -4,6 +4,8 @@ import { useAuth } from "@/components/context/AuthContext";
 import { signup } from "@/services/authService";
 import { LoginData } from "@/types/customeType/loginData";
 import { signUpData } from "@/types/customeType/signUpData";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
@@ -11,6 +13,7 @@ import { useEffect, useState } from "react";
 export default function LogSignPage() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",
     password: "",
@@ -64,14 +67,14 @@ export default function LogSignPage() {
 
   return (
     <div className="w-full h-full" style={{ background: "var(--gradient-bg)" }}>
-      <div className="w-[60%] h-screen mx-auto flex items-center ">
-        <div className="shadow-2xl w-full bg-white border-2 border-white h-[60%] rounded-2xl relative">
+      <div className="w-[90%] sm:w-[80%] lg:w-[60%] h-screen mx-auto flex items-center">
+        <div className="shadow-2xl w-full bg-white border-2 border-white h-[70%] sm:h-[65%] lg:h-[60%] rounded-2xl relative">
           <div
-            className={`absolute text-black top-0 left-0 w-1/2 h-full p-10 py-20 z-20 flex flex-col items-center justify-center space-y-10 ${
+            className={`absolute text-black top-0 left-0 w-1/2 h-full p-4 sm:p-6 lg:p-10 py-10 sm:py-15 lg:py-20 z-20 flex flex-col items-center justify-center space-y-6 sm:space-y-8 lg:space-y-10 ${
               isLogin ? "" : "opacity-0 transform translate-x-full"
             } transition duration-700 ease-in-out`}
           >
-            <h2 className="font-bold text-4xl ">ĐĂNG NHẬP</h2>
+            <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl">ĐĂNG NHẬP</h2>
             <div className="space-y-4">
               <input
                 type="text"
@@ -80,33 +83,36 @@ export default function LogSignPage() {
                 onChange={(e) =>
                   setLoginData({ ...loginData, email: e.target.value })
                 }
-                className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
+                className="w-full bg-gray-300 p-2 sm:p-3 rounded-2xl text-sm sm:text-base lg:text-lg focus:outline-none"
               />
-              <input
-                type="text"
+              <div className="flex items-center w-full bg-gray-300 p-2 sm:p-3 rounded-2xl text-sm sm:text-base lg:text-lg">
+                <input
+                type={showPassword ? "text" : "password"}
                 placeholder="Mật khẩu"
                 value={loginData.password}
                 onChange={(e) =>
                   setLoginData({ ...loginData, password: e.target.value })
                 }
-                className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
+                className=" focus:outline-none mr-2 flex-1" 
               />
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} onClick={() => setShowPassword(!showPassword)} className="select-none cursor-pointer"/>
+              </div>
             </div>
             <button
-              className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[50%] text-white text-lg font-medium rounded-2xl"
+              className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[60%] sm:w-[50%] text-white text-sm sm:text-base lg:text-lg font-medium rounded-2xl"
               onClick={handleLogin}
             >
               Đăng nhập
             </button>
           </div>
           <div
-            className={`absolute text-black top-0 left-0 w-1/2 h-full p-10 py-20 z-10 flex flex-col items-center justify-center space-y-10 ${
+            className={`absolute text-black top-0 left-0 w-1/2 h-full p-4 sm:p-6 lg:p-10 py-10 sm:py-15 lg:py-20 z-10 flex flex-col items-center justify-center space-y-6 sm:space-y-8 lg:space-y-10 ${
               isLogin
                 ? "opacity-0 "
                 : "z-50 transform translate-x-full opacity-100"
             } transition duration-700 ease-in-out`}
           >
-            <h2 className="font-bold text-4xl text-black">ĐĂNG KÝ</h2>
+            <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-black">ĐĂNG KÝ</h2>
             <div className="space-y-4">
               <input
                 type="text"
@@ -115,7 +121,7 @@ export default function LogSignPage() {
                 onChange={(e) =>
                   setsignUpData({ ...signUpData, name: e.target.value })
                 }
-                className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
+                className="w-full bg-gray-300 p-2 sm:p-3 rounded-2xl text-sm sm:text-base lg:text-lg focus:outline-none"
               />
               <input
                 type="text"
@@ -124,7 +130,7 @@ export default function LogSignPage() {
                 onChange={(e) =>
                   setsignUpData({ ...signUpData, email: e.target.value })
                 }
-                className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
+                className="w-full bg-gray-300 p-2 sm:p-3 rounded-2xl text-sm sm:text-base lg:text-lg focus:outline-none"
               />
               <input
                 type="text"
@@ -133,11 +139,11 @@ export default function LogSignPage() {
                 onChange={(e) =>
                   setsignUpData({ ...signUpData, password: e.target.value })
                 }
-                className="w-full bg-gray-300 p-3 rounded-2xl text-lg focus:outline-none"
+                className="w-full bg-gray-300 p-2 sm:p-3 rounded-2xl text-sm sm:text-base lg:text-lg focus:outline-none"
               />
             </div>
             <button
-              className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[50%] text-white text-lg font-medium rounded-2xl"
+              className="bg-blue-500 transition hover:bg-blue-700 p-2 w-[60%] sm:w-[50%] text-white text-sm sm:text-base lg:text-lg font-medium rounded-2xl"
               onClick={handleSignUp}
             >
               Đăng ký
@@ -154,36 +160,36 @@ export default function LogSignPage() {
               }`}
             >
               <div
-                className={`absolute top-0 w-1/2 h-full flex flex-col items-center justify-center transition duration-700 text-center px-10 text-white space-y-3 ${
+                className={`absolute top-0 w-1/2 h-full flex flex-col items-center justify-center transition duration-700 text-center px-4 sm:px-6 lg:px-10 text-white space-y-2 sm:space-y-3 ${
                   isLogin ? "transform -translate-x-1/5" : ""
                 }`}
               >
-                <p className="text-3xl font-bold drop-shadow-xl">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold drop-shadow-xl">
                   Tạo tài khoản và bắt đầu 💬
                 </p>
-                <p className="italic text-gray-200">
+                <p className="italic text-gray-200 text-xs sm:text-sm lg:text-base">
                   Nếu bạn đã có tài khoản, hãy chọn nút đăng nhập
                 </p>
                 <button
-                  className="p-2 text-lg bg-white/20 border-2 border-white w-[30%] transition hover:bg-white/0 hover:-translate-y-0.5 shadow rounded-xl"
+                  className="p-2 text-sm sm:text-base lg:text-lg bg-white/20 border-2 border-white w-[40%] sm:w-[35%] lg:w-[30%] transition hover:bg-white/0 hover:-translate-y-0.5 shadow rounded-xl"
                   onClick={() => setIsLogin(true)}
                 >
                   Đăng nhập
                 </button>
               </div>
               <div
-                className={`absolute top-0 left-1/2 w-1/2 h-full flex flex-col items-center justify-center transition duration-700 text-center px-10 text-white space-y-3 ${
+                className={`absolute top-0 left-1/2 w-1/2 h-full flex flex-col items-center justify-center transition duration-700 text-center px-4 sm:px-6 lg:px-10 text-white space-y-2 sm:space-y-3 ${
                   isLogin ? "" : "transform translate-x-1/5"
                 }`}
               >
-                <p className="text-3xl font-bold drop-shadow-xl">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold drop-shadow-xl">
                   Chào mừng bạn trở lại 👋
                 </p>
-                <p className="italic text-gray-200">
+                <p className="italic text-gray-200 text-xs sm:text-sm lg:text-base">
                   Nếu bạn chưa có tài khoản, hãy chọn nút đăng ký
                 </p>
                 <button
-                  className="p-2 text-lg bg-white/20 border-2 border-white w-[30%] transition hover:bg-white/0 hover:-translate-y-0.5 shadow rounded-xl"
+                  className="p-2 text-sm sm:text-base lg:text-lg bg-white/20 border-2 border-white w-[40%] sm:w-[35%] lg:w-[30%] transition hover:bg-white/0 hover:-translate-y-0.5 shadow rounded-xl"
                   onClick={() => setIsLogin(false)}
                 >
                   Đăng ký
