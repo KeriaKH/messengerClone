@@ -12,8 +12,7 @@ import {
 import {
   faEllipsis,
   faPhone,
-  faVideo,
-  faX,
+  faVideo
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmojiPicker from "emoji-picker-react";
@@ -128,10 +127,14 @@ export default function ChatBox({
       chat.members.find((m) => m.id._id !== user?.id)?.id._id || "";
     if (!receiver) return;
     if (!socket) return;
-    socket?.emit("call_request", receiver, user?.id,type);
+    socket?.emit("call_request", receiver, user?.id, type);
 
     const features = `width=${width},height=${height},left=${left},top=${top},resizable=yes`;
-    window.open(`/call?receiver=${receiver}&type=${type}&isCaller=true`, "phoneCall", features);
+    window.open(
+      `/call?receiver=${receiver}&type=${type}&isCaller=true`,
+      "phoneCall",
+      features
+    );
   };
 
   return (
@@ -145,18 +148,22 @@ export default function ChatBox({
           </p>
         </div>
         <div>
+          {!chat.isGroup && (
+            <FontAwesomeIcon
+              icon={faPhone}
+              className=" p-3 rounded-full hover:bg-white/10 "
+              onClick={() => handlePhoneCall("audio")}
+            />
+          )}
+          {!chat.isGroup && (
+            <FontAwesomeIcon
+              icon={faVideo}
+              className=" p-3 rounded-full hover:bg-white/10 "
+              onClick={() => handlePhoneCall("video")}
+            />
+          )}
           <FontAwesomeIcon
-            icon={faPhone}
-            className=" p-3 rounded-full hover:bg-white/10 "
-            onClick={() => handlePhoneCall("audio")}
-          />
-          <FontAwesomeIcon
-            icon={faVideo}
-            className=" p-3 rounded-full hover:bg-white/10 "
-            onClick={() => handlePhoneCall("video")}
-          />
-          <FontAwesomeIcon
-            icon={openProfile ? faX : faEllipsis}
+            icon={faEllipsis}
             className=" p-3 rounded-full hover:bg-white/10 "
             onClick={() => setOpenProfile(!openProfile)}
           />
